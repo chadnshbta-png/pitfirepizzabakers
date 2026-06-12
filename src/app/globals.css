@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #D12626;
+  --background: #000000;
+  --foreground: #ffffff;
+  --gold: #C9A052;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #D12626;
+  border-radius: 2px;
+}
+
+/* Selection */
+::selection {
+  background: #D12626;
+  color: #ffffff;
+}
+
+/* Smooth scroll hint line */
+@keyframes scrollLine {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(300%); }
+}
+
+.animate-scroll-line {
+  animation: scrollLine 2s ease-in-out infinite;
+}
+
+/* Grain overlay */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: -200%;
+  width: 400%;
+  height: 400%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 9999;
+  animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+/* Video panel 3D */
+.video-panel {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* Menu card glow */
+.menu-card-glow {
+  box-shadow: 0 0 0 0 rgba(209, 38, 38, 0);
+  transition: box-shadow 0.5s ease;
+}
+.menu-card-glow:hover {
+  box-shadow: 0 0 60px 10px rgba(209, 38, 38, 0.15), 0 30px 60px rgba(0, 0, 0, 0.8);
+}
+
+/* Text reveal clip */
+.text-reveal-clip {
+  overflow: hidden;
+}
+.text-reveal-clip > * {
+  display: block;
+}
+
+/* Section divider */
+.section-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--primary);
+  display: block;
+}
+
+/* Hover underline */
+.hover-underline {
+  position: relative;
+}
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+.hover-underline:hover::after {
+  width: 100%;
+}
+
+/* Perspective container */
+.perspective-1200 {
+  perspective: 1200px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
