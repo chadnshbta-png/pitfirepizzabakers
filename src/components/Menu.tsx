@@ -1,245 +1,273 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { motion, AnimatePresence, useInView } from 'framer-motion'
-import { menuItems, categories, type MenuCategory } from '@/data/menuItems'
+import { useRef, useEffect, useState } from 'react'
+import gsap from 'gsap'
+import { menuItems, type MenuItem } from '@/data/menuItems'
 
-function MenuCard({ item, index }: { item: (typeof menuItems)[0]; index: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: true, margin: '-8%' })
-  const [hovered, setHovered] = useState(false)
+const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
+
+/* ── Category chapters (real data categories, in display order) ─────── */
+const CATS: { key: MenuItem['category']; tagline: string }[] = [
+  { key: 'Pizza', tagline: '72-hour fermented · fire-kissed' },
+  { key: 'Pasta', tagline: 'Hand-finished · sauced to order' },
+  { key: 'Starters', tagline: 'The opening act' },
+  { key: 'Desserts', tagline: 'House-made · every day' },
+]
+
+/* per-column parallax speed (px) + staggered start offset (px) by column count */
+const COL_CONFIG: Record<number, { speed: number; offset: number }[]> = {
+  1: [{ speed: -20, offset: 0 }],
+  2: [{ speed: -48, offset: 0 }, { speed: 34, offset: 56 }],
+  3: [{ speed: -62, offset: 0 }, { speed: 44, offset: 72 }, { speed: -26, offset: 32 }],
+}
+
+const GLOW_KEYFRAMES = `
+  @keyframes menu-glow-a { 0%,100%{transform:translate(0,0) scale(1);opacity:.06} 50%{transform:translate(40px,-30px) scale(1.12);opacity:.10} }
+  @keyframes menu-glow-b { 0%,100%{transform:translate(0,0) scale(1);opacity:.04} 50%{transform:translate(-32px,26px) scale(1.08);opacity:.07} }
+`
+
+const BASE_SHADOW = '0 24px 55px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.05)'
+
+/* ── Floating food card with 3D hover ───────────────────────────────── */
+function MenuCard({ item }: { item: MenuItem }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const onMove = (e: React.MouseEvent) => {
+    const el = cardRef.current
+    if (!el || window.innerWidth < 768) return
+    const r = el.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width - 0.5
+    const y = (e.clientY - r.top) / r.height - 0.5
+    gsap.to(el, {
+      rotateY: x * 10, rotateX: -y * 8, scale: 1.05, z: 40,
+      duration: 0.4, ease: 'power2.out', transformPerspective: 900, overwrite: 'auto',
+    })
+    el.style.zIndex = '5'
+    el.style.boxShadow = [
+      `${-x * 32}px ${-y * 32 + 22}px 70px rgba(0,0,0,.7)`,
+      '0 0 55px rgba(209,38,38,.28)',
+      '0 0 0 1px rgba(209,38,38,.32)',
+    ].join(',')
+  }
+
+  const onLeave = () => {
+    const el = cardRef.current
+    if (!el) return
+    gsap.to(el, { rotateX: 0, rotateY: 0, scale: 1, z: 0, duration: 0.55, ease: 'power2.out', overwrite: 'auto' })
+    el.style.boxShadow = BASE_SHADOW
+    el.style.zIndex = '1'
+  }
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.9,
-        delay: (index % 4) * 0.08,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      className="group relative menu-card-glow cursor-pointer"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ perspective: '800px' }}
-    >
-      <motion.div
-        animate={
-          hovered
-            ? { rotateX: -4, rotateY: 4, scale: 1.02, y: -8 }
-            : { rotateX: 0, rotateY: 0, scale: 1, y: 0 }
-        }
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="relative overflow-hidden bg-zinc-950 border border-white/5"
-        style={{ transformStyle: 'preserve-3d' }}
+    <div data-reveal style={{ opacity: 1 }}>
+      <div
+        ref={cardRef}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+        style={{
+          position: 'relative', borderRadius: '16px', overflow: 'hidden',
+          background: 'rgba(14,7,7,.6)', backdropFilter: 'blur(14px)',
+          border: '1px solid rgba(255,255,255,.06)', boxShadow: BASE_SHADOW,
+          cursor: 'pointer', willChange: 'transform', transformStyle: 'preserve-3d',
+        }}
       >
-        {/* Image */}
-        <div className="relative overflow-hidden" style={{ aspectRatio: '1 / 1' }}>
-          <motion.img
-            src={item.image}
-            alt={item.name}
-            className="w-full h-full object-cover block"
-            animate={hovered ? { scale: 1.08 } : { scale: 1 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        {/* Image (natural ratio → gallery masonry) */}
+        <div style={{ position: 'relative', overflow: 'hidden' }}>
+          <img
+            src={item.image} alt={item.name}
+            loading="lazy"
+            style={{ display: 'block', width: '100%', height: 'auto' }}
           />
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60" />
-
-          {/* Hover red glow */}
-          <motion.div
-            animate={{ opacity: hovered ? 1 : 0 }}
-            transition={{ duration: 0.4 }}
-            className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent pointer-events-none"
-          />
-
-          {/* Tag badge */}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,.55), transparent 45%)', pointerEvents: 'none' }} />
           {item.tag && (
-            <div className="absolute top-3 left-3 z-10">
-              <span className="font-josefin text-[7px] tracking-[0.4em] uppercase px-2.5 py-1 bg-primary/90 text-white">
-                {item.tag}
-              </span>
-            </div>
+            <span className="font-josefin" style={{
+              position: 'absolute', top: 12, left: 12,
+              fontSize: '.5rem', letterSpacing: '.34em', textTransform: 'uppercase',
+              color: '#fff', background: 'rgba(209,38,38,.92)', padding: '5px 9px', borderRadius: 4,
+            }}>{item.tag}</span>
           )}
-
-          {/* Corner accents on hover */}
-          <motion.div
-            animate={{ opacity: hovered ? 1 : 0 }}
-            transition={{ duration: 0.3 }}
-            className="absolute top-0 right-0 w-8 h-8 pointer-events-none"
-          >
-            <div className="absolute top-0 right-0 w-full h-0.5 bg-white/30" />
-            <div className="absolute top-0 right-0 h-full w-0.5 bg-white/30" />
-          </motion.div>
         </div>
 
-        {/* Content */}
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <h3 className="font-cormorant text-lg text-white font-light leading-tight group-hover:text-white transition-colors">
-                {item.name}
-              </h3>
-              <p className="font-josefin text-[8px] tracking-[0.3em] uppercase text-white/30 mt-1">
-                {item.category}
-              </p>
-            </div>
-            <motion.div
-              animate={{ opacity: hovered ? 1 : 0, x: hovered ? 0 : 4 }}
-              transition={{ duration: 0.3 }}
-              className="shrink-0 w-6 h-6 flex items-center justify-center border border-white/10 mt-0.5"
-            >
-              <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                <path d="M1 7L7 1M7 1H2M7 1V6" stroke="white" strokeOpacity="0.6" strokeWidth="1" />
-              </svg>
-            </motion.div>
+        {/* Info */}
+        <div style={{ padding: '16px 18px 18px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '1rem' }}>
+            <h3 className="font-cormorant" style={{ fontSize: '1.3rem', fontWeight: 300, color: 'rgba(255,255,255,.94)', lineHeight: 1.15 }}>
+              {item.name}
+            </h3>
+            <span className="font-josefin" style={{ flexShrink: 0, fontSize: '.6rem', letterSpacing: '.22em', color: '#D12626', whiteSpace: 'nowrap' }}>
+              AED&nbsp;—
+            </span>
           </div>
-
-          <motion.p
-            animate={{ height: hovered ? 'auto' : 0, opacity: hovered ? 1 : 0 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="font-cormorant text-sm text-white/40 italic overflow-hidden mt-2"
-          >
+          <p className="font-cormorant" style={{ fontSize: '.95rem', fontStyle: 'italic', color: 'rgba(255,255,255,.42)', lineHeight: 1.55, marginTop: 6 }}>
             {item.description}
-          </motion.p>
+          </p>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   )
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   Menu — a 3D cinematic food gallery
+   ════════════════════════════════════════════════════════════════════ */
 export default function Menu() {
-  const [activeCategory, setActiveCategory] = useState<MenuCategory>('All')
-  const titleRef = useRef<HTMLDivElement>(null)
-  const titleInView = useInView(titleRef, { once: true })
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const [cols, setCols] = useState(3)
 
-  const filtered =
-    activeCategory === 'All'
-      ? menuItems
-      : menuItems.filter((item) => item.category === activeCategory)
+  /* responsive column count */
+  useEffect(() => {
+    const calc = () => setCols(window.innerWidth >= 1024 ? 3 : window.innerWidth >= 640 ? 2 : 1)
+    calc()
+    window.addEventListener('resize', calc)
+    return () => window.removeEventListener('resize', calc)
+  }, [])
+
+  /* parallax + reveal engine (live position, no pin/sticky) */
+  useEffect(() => {
+    const root = sectionRef.current
+    if (!root) return
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const mobile = window.innerWidth < 768
+    const mAmp = mobile ? 0.5 : 1
+
+    type T = { el: HTMLElement; kind: 'pfx' | 'rev'; speed: number; rot: number; scale: number; fade: boolean; rect?: DOMRect }
+    const targets: T[] = [
+      ...gsap.utils.toArray<HTMLElement>('[data-pfx]', root).map(el => ({
+        el, kind: 'pfx' as const,
+        speed: parseFloat(el.dataset.speed || '0'),
+        rot: parseFloat(el.dataset.rot || '0'),
+        scale: parseFloat(el.dataset.scale || '0'),
+        fade: el.dataset.fade === '1',
+      })),
+      ...gsap.utils.toArray<HTMLElement>('[data-reveal]', root).map(el => ({
+        el, kind: 'rev' as const, speed: 0, rot: 0, scale: 0, fade: true,
+      })),
+    ]
+
+    if (reduce) {
+      targets.forEach(t => { if (t.fade) t.el.style.opacity = '1' })
+      return
+    }
+
+    const update = () => {
+      const h = window.innerHeight
+      const vc = h / 2
+      // PASS 1 — read all rects (avoid layout thrash)
+      for (const t of targets) t.rect = t.el.getBoundingClientRect()
+      // PASS 2 — write transforms / opacity
+      for (const t of targets) {
+        const r = t.rect!
+        if (r.bottom < -400 || r.top > h + 400) continue
+        const q = clamp((r.top + r.height / 2 - vc) / h, -1.2, 1.2)
+        if (t.kind === 'pfx') {
+          gsap.set(t.el, {
+            y: q * t.speed * mAmp,
+            scale: t.scale ? 1 - clamp(Math.abs(q), 0, 0.6) * t.scale : 1,
+            force3D: true,
+          })
+          if (t.fade) t.el.style.opacity = String(clamp((0.8 - q) / 0.4, 0, 1))
+        } else {
+          t.el.style.opacity = String(clamp((0.62 - q) / 0.26, 0, 1))
+        }
+      }
+    }
+
+    gsap.ticker.add(update)
+    update()
+    return () => gsap.ticker.remove(update)
+  }, [cols])
 
   return (
-    <section id="menu" className="relative bg-black py-32 md:py-40 overflow-hidden">
-      {/* Background texture */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-primary/4 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/3 left-0 w-[300px] h-[300px] bg-primary/3 rounded-full blur-[120px]" />
+    <section
+      id="menu"
+      ref={sectionRef}
+      style={{ background: '#000', position: 'relative', overflowX: 'clip' }}
+    >
+      <style>{GLOW_KEYFRAMES}</style>
+
+      {/* Ambient glow */}
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+        <div style={{ position: 'absolute', top: '8%', right: '-8%', width: '50%', height: '44%', background: 'radial-gradient(ellipse,#D12626 0%,transparent 68%)', filter: 'blur(150px)', animation: 'menu-glow-a 28s ease-in-out infinite' }} />
+        <div style={{ position: 'absolute', bottom: '10%', left: '-10%', width: '46%', height: '42%', background: 'radial-gradient(ellipse,#D12626 0%,transparent 66%)', filter: 'blur(165px)', animation: 'menu-glow-b 34s ease-in-out infinite', animationDelay: '-16s' }} />
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-6 md:px-10">
+      {/* ── Section intro ── */}
+      <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: 'clamp(5rem,12vh,9rem) clamp(1.5rem,5vw,4rem) clamp(2rem,5vh,4rem)' }}>
+        <div data-pfx data-speed="-40" data-fade="1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '1.6rem' }}>
+          <span style={{ width: '2.5rem', height: '1px', background: '#D12626', opacity: .6 }} />
+          <span className="font-josefin" style={{ fontSize: '.6rem', letterSpacing: '.52em', textTransform: 'uppercase', color: '#D12626' }}>The Menu</span>
+          <span style={{ width: '2.5rem', height: '1px', background: '#D12626', opacity: .6 }} />
+        </div>
+        <h2 data-pfx data-speed="-30" data-scale="0.04" data-fade="1" className="font-cormorant" style={{ fontSize: 'clamp(2.6rem,6vw,5.5rem)', fontWeight: 300, color: '#fff', lineHeight: 1.02, letterSpacing: '-.02em' }}>
+          Crafted with <em style={{ fontStyle: 'italic', color: '#D12626' }}>Obsession.</em>
+        </h2>
+        <p data-pfx data-speed="-22" data-fade="1" className="font-cormorant" style={{ fontSize: 'clamp(1rem,1.5vw,1.2rem)', fontStyle: 'italic', color: 'rgba(255,255,255,.4)', marginTop: '1.4rem' }}>
+          A curated exhibition — every item house-made, every day.
+        </p>
+      </div>
 
-        {/* ── Header ── */}
-        <div ref={titleRef} className="mb-16 md:mb-20">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={titleInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="flex items-center gap-4 mb-10"
-          >
-            <span className="section-divider" />
-            <span className="font-josefin text-[9px] tracking-[0.5em] uppercase text-primary">
-              The Menu
-            </span>
-          </motion.div>
+      {/* ── Category chapters ── */}
+      {CATS.map(cat => {
+        const items = menuItems.filter(m => m.category === cat.key)
+        if (!items.length) return null
+        const conf = COL_CONFIG[cols]
+        const columns: MenuItem[][] = Array.from({ length: cols }, () => [])
+        items.forEach((it, i) => columns[i % cols].push(it))
 
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-            <div>
-              <div className="overflow-hidden">
-                <motion.h2
-                  initial={{ y: '100%' }}
-                  animate={titleInView ? { y: 0 } : {}}
-                  transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                  className="font-cormorant font-light text-white leading-none"
-                  style={{ fontSize: 'clamp(2.5rem, 7vw, 6rem)' }}
-                >
-                  Crafted with
-                </motion.h2>
-              </div>
-              <div className="overflow-hidden">
-                <motion.h2
-                  initial={{ y: '100%' }}
-                  animate={titleInView ? { y: 0 } : {}}
-                  transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  className="font-cormorant italic text-primary leading-none"
-                  style={{ fontSize: 'clamp(2.5rem, 7vw, 6rem)' }}
-                >
-                  Obsession.
-                </motion.h2>
-              </div>
+        return (
+          <div key={cat.key} style={{ position: 'relative', zIndex: 1, padding: 'clamp(4rem,9vh,8rem) 0 clamp(5rem,10vh,9rem)' }}>
+            {/* Giant background watermark */}
+            <div aria-hidden="true" style={{ position: 'absolute', top: 'clamp(1rem,5vh,4rem)', left: 0, right: 0, textAlign: 'center', zIndex: 0, pointerEvents: 'none' }}>
+              <span data-pfx data-speed="130" data-fade="1" className="font-cormorant" style={{ display: 'inline-block', fontWeight: 300, lineHeight: 1, fontSize: 'clamp(7rem,24vw,19rem)', color: 'rgba(255,255,255,.035)', textTransform: 'uppercase', userSelect: 'none', whiteSpace: 'nowrap', willChange: 'transform' }}>
+                {cat.key}
+              </span>
             </div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={titleInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="font-cormorant text-lg text-white/40 italic max-w-xs"
-            >
-              Every item house-made. Every day. No exceptions.
-            </motion.p>
+            {/* Cinematic category title */}
+            <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 clamp(1.5rem,5vw,4rem)', marginBottom: 'clamp(2.5rem,6vh,5.5rem)' }}>
+              <div data-pfx data-speed="-50" data-fade="1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.8rem', marginBottom: '1.2rem' }}>
+                <span style={{ width: '1.6rem', height: '1px', background: '#D12626', opacity: .6 }} />
+                <span className="font-josefin" style={{ fontSize: '.52rem', letterSpacing: '.4em', textTransform: 'uppercase', color: 'rgba(255,255,255,.4)' }}>
+                  {items.length} {items.length === 1 ? 'Creation' : 'Creations'}
+                </span>
+                <span style={{ width: '1.6rem', height: '1px', background: '#D12626', opacity: .6 }} />
+              </div>
+              <h2 data-pfx data-speed="-78" data-scale="0.05" data-fade="1" className="font-cormorant" style={{ fontSize: 'clamp(3rem,11vw,9rem)', fontWeight: 300, color: '#fff', lineHeight: 1, letterSpacing: '0.01em', textTransform: 'uppercase', willChange: 'transform' }}>
+                {cat.key}
+              </h2>
+              <p data-pfx data-speed="-34" data-fade="1" className="font-cormorant" style={{ fontSize: 'clamp(1rem,1.5vw,1.25rem)', fontStyle: 'italic', color: 'rgba(255,255,255,.42)', marginTop: '1rem' }}>
+                {cat.tagline}
+              </p>
+            </div>
+
+            {/* Curated columns (each a depth layer) */}
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: 1240, margin: '0 auto', padding: '0 clamp(1.25rem,4vw,3rem)', display: 'flex', gap: 'clamp(1rem,2vw,1.75rem)', alignItems: 'flex-start' }}>
+              {columns.map((col, ci) => (
+                <div
+                  key={ci}
+                  data-pfx data-speed={String(conf[ci].speed)}
+                  style={{ flex: 1, minWidth: 0, marginTop: cols === 1 ? 0 : conf[ci].offset, display: 'flex', flexDirection: 'column', gap: 'clamp(1rem,2vw,1.75rem)', willChange: 'transform' }}
+                >
+                  {col.map(item => <MenuCard key={item.id} item={item} />)}
+                </div>
+              ))}
+            </div>
           </div>
+        )
+      })}
+
+      {/* ── Closing note ── */}
+      <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 clamp(1.5rem,5vw,4rem) clamp(6rem,12vh,11rem)' }}>
+        <p data-reveal className="font-cormorant" style={{ opacity: 1, fontSize: 'clamp(1.1rem,1.8vw,1.5rem)', fontStyle: 'italic', color: 'rgba(255,255,255,.42)', maxWidth: '42rem', margin: '0 auto', lineHeight: 1.7 }}>
+          Sweet Italian fennel sausage, all desserts, dressings and most toppings
+          are house-made daily.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+          <span style={{ width: '2rem', height: '1px', background: 'rgba(209,38,38,.5)' }} />
+          <span className="font-josefin" style={{ fontSize: '.55rem', letterSpacing: '.5em', textTransform: 'uppercase', color: 'rgba(255,255,255,.2)' }}>Made fresh · Every day</span>
+          <span style={{ width: '2rem', height: '1px', background: 'rgba(209,38,38,.5)' }} />
         </div>
-
-        {/* ── Category Filter ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={titleInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex items-center gap-1 mb-12 overflow-x-auto pb-2 scrollbar-hide"
-        >
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`relative font-josefin text-[9px] tracking-[0.35em] uppercase px-5 py-2.5 whitespace-nowrap transition-all duration-300 ${
-                activeCategory === cat
-                  ? 'text-white bg-primary'
-                  : 'text-white/40 border border-white/10 hover:text-white hover:border-white/30'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </motion.div>
-
-        {/* ── Items Grid ── */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
-          >
-            {filtered.map((item, i) => (
-              <MenuCard key={item.id} item={item} index={i} />
-            ))}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* ── Bottom CTA ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="mt-20 pt-16 border-t border-white/5 text-center"
-        >
-          <p className="font-cormorant text-2xl text-white/40 italic mb-6">
-            Sweet Italian fennel sausage, all desserts, dressings and most toppings
-            <br />are house-made daily.
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <span className="block w-8 h-px bg-primary/50" />
-            <span className="font-josefin text-[9px] tracking-[0.5em] uppercase text-white/20">
-              Made fresh · Every day
-            </span>
-            <span className="block w-8 h-px bg-primary/50" />
-          </div>
-        </motion.div>
       </div>
     </section>
   )

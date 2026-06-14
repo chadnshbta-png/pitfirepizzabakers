@@ -22,7 +22,10 @@ html {
 body {
   background-color: #000000;
   color: #ffffff;
-  overflow-x: hidden;
+  /* `clip` prevents horizontal overflow WITHOUT turning body into a scroll
+     container (which `hidden` would, by forcing overflow-y:auto) — that scroll
+     container breaks `position: sticky` for descendants like the Locations scene. */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
