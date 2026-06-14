@@ -47,6 +47,10 @@ export default function Locations() {
   const curtainRef = useRef<HTMLDivElement>(null)
   const focusRef = useRef(0)
 
+  // Mobile / tablet depth-stack refs
+  const mCardRefs = useRef<(HTMLAnchorElement | null)[]>([])
+  const mImgRefs = useRef<(HTMLImageElement | null)[]>([])
+
   // HUD elements are updated via refs (NOT React state) so the component
   // never re-renders — a re-render would let React reconcile the panel
   // `style` prop and wipe GSAP's inline transform/opacity, flashing every
@@ -60,9 +64,14 @@ export default function Locations() {
 
   /* ── Decide experience tier ─────────────────────────────────────── */
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const small = window.innerWidth < 768
-    setSimple(reduce || small)
+    // Desktop (≥1024, mouse) keeps the full 3D fly-through, untouched.
+    // Phones + tablets (<1024) get the adapted touch-friendly depth stack.
+    const calc = () => setSimple(
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.innerWidth < 1024
+    )
+    calc()
+    window.addEventListener('resize', calc)
+    return () => window.removeEventListener('resize', calc)
   }, [])
 
   /* ── 3D camera rig ──────────────────────────────────────────────── */
@@ -148,32 +157,87 @@ export default function Locations() {
     return () => gsap.ticker.remove(update)
   }, [simple])
 
+  /* ── Mobile / tablet depth driver — scroll-driven 3D on the card stack ── */
+  useEffect(() => {
+    if (!simple) return
+    const cards = mImgRefs.current.length ? mCardRefs.current : []
+    if (!cards.some(Boolean)) return
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce) {
+      mCardRefs.current.forEach(c => { if (c) c.style.opacity = '1' })
+      return
+    }
+
+    const update = () => {
+      const vh = window.innerHeight
+      const vc = vh / 2
+      const rects = mCardRefs.current.map(c => c?.getBoundingClientRect())
+      mCardRefs.current.forEach((c, i) => {
+        const r = rects[i]
+        if (!c || !r || r.bottom < -200 || r.top > vh + 200) return
+        const q = clamp((r.top + r.height / 2 - vc) / vh, -1, 1) // −1 top … +1 bottom
+        gsap.set(c, {
+          scale: 1 - Math.abs(q) * 0.11,        // grows toward centre (depth approach)
+          rotateX: q * 7,                        // tilts as it passes (3D)
+          opacity: clamp(1 - Math.abs(q) * 0.5, 0.5, 1),
+          transformPerspective: 760, transformOrigin: 'center', force3D: true,
+        })
+        const img = mImgRefs.current[i]
+        if (img) gsap.set(img, { yPercent: q * 9, force3D: true })  // internal pan (clipped)
+      })
+    }
+    gsap.ticker.add(update)
+    update()
+    return () => gsap.ticker.remove(update)
+  }, [simple])
+
   /* ════════════════════════════════════════════════════════════════
-     SIMPLE FALLBACK (mobile / reduced motion)
+     MOBILE / TABLET — premium scroll-driven 3D depth stack
+     (touch-friendly; preserves the depth + motion of the desktop scene)
      ════════════════════════════════════════════════════════════════ */
   if (simple) {
     return (
-      <section id="locations" style={{ background: '#000', position: 'relative', overflow: 'hidden' }}>
+      <section id="locations" style={{ background: '#000', position: 'relative', overflowX: 'clip' }}>
         <style>{GLOW_KEYFRAMES}</style>
         <AmbientGlow />
-        <div style={{ position: 'relative', zIndex: 2, padding: 'clamp(4rem,9vh,7rem) clamp(1.5rem,5vw,3rem)' }}>
+        <div style={{ position: 'relative', zIndex: 2, padding: 'clamp(4rem,9vh,7rem) clamp(1.5rem,6vw,3rem) clamp(3rem,7vh,6rem)' }}>
           <Header />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem', marginTop: '2.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(2rem,5vh,3rem)', marginTop: 'clamp(2.5rem,6vh,4rem)', perspective: 900 }}>
             {locations.map((loc, i) => (
-              <a key={loc.id} href={loc.mapUrl} target="_blank" rel="noopener noreferrer"
+              <a
+                key={loc.id}
+                ref={el => { mCardRefs.current[i] = el }}
+                href={loc.mapUrl} target="_blank" rel="noopener noreferrer"
                 style={{
-                  display: 'grid', gridTemplateColumns: '92px 1fr', gap: '1rem',
-                  background: 'rgba(14,5,5,.72)', border: '1px solid rgba(209,38,38,.14)',
-                  borderRadius: '14px', padding: '14px', textDecoration: 'none',
-                  backdropFilter: 'blur(14px)',
-                }}>
-                <div style={{ height: '92px', borderRadius: '9px', overflow: 'hidden' }}>
-                  <img src={loc.image} alt={loc.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  display: 'block', position: 'relative', width: '100%', maxWidth: 560, margin: '0 auto',
+                  borderRadius: 18, overflow: 'hidden', textDecoration: 'none',
+                  background: 'rgba(14,5,5,.6)', backdropFilter: 'blur(16px)',
+                  border: '1px solid rgba(209,38,38,.20)',
+                  boxShadow: '0 40px 90px rgba(0,0,0,.65), 0 0 55px rgba(209,38,38,.14), inset 0 1px 0 rgba(255,255,255,.06)',
+                  willChange: 'transform, opacity', transformStyle: 'preserve-3d', opacity: 1,
+                }}
+              >
+                {/* Image with internal pan */}
+                <div style={{ position: 'relative', height: 'clamp(220px,42vw,300px)', overflow: 'hidden' }}>
+                  <img
+                    ref={el => { mImgRefs.current[i] = el }}
+                    src={loc.image} alt={loc.name}
+                    style={{ position: 'absolute', left: 0, top: '-9%', width: '100%', height: '118%', objectFit: 'cover', willChange: 'transform' }}
+                  />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,.7), transparent 55%)', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '2rem', height: 1, background: '#D12626', opacity: .6 }} />
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: 1, height: '2rem', background: '#D12626', opacity: .6 }} />
+                  <span className="font-cormorant" style={{ position: 'absolute', top: 10, right: 16, fontSize: '2.4rem', fontWeight: 300, color: 'rgba(255,255,255,.14)', lineHeight: 1 }}>0{i + 1}</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <span className="font-josefin" style={{ fontSize: '.5rem', letterSpacing: '.4em', color: '#D12626', marginBottom: 4 }}>0{i + 1}</span>
-                  <h3 className="font-cormorant" style={{ fontSize: '1.3rem', fontWeight: 300, color: 'rgba(255,255,255,.92)' }}>{loc.name}</h3>
-                  <span className="font-josefin" style={{ fontSize: '.55rem', letterSpacing: '.32em', textTransform: 'uppercase', color: 'rgba(255,255,255,.34)', marginTop: 6 }}>Get Directions →</span>
+                {/* Info */}
+                <div style={{ padding: '16px 20px 20px' }}>
+                  <h3 className="font-cormorant" style={{ fontSize: '1.6rem', fontWeight: 300, color: 'rgba(255,255,255,.94)', lineHeight: 1.15 }}>{loc.name}</h3>
+                  <p className="font-josefin" style={{ fontSize: '.52rem', letterSpacing: '.34em', textTransform: 'uppercase', color: 'rgba(255,255,255,.4)', marginTop: 7, marginBottom: 15 }}>{loc.address}</p>
+                  <span className="font-josefin" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '.58rem', letterSpacing: '.4em', textTransform: 'uppercase', color: '#D12626', border: '1px solid rgba(209,38,38,.5)', background: 'rgba(209,38,38,.1)', padding: '10px 18px', borderRadius: 999 }}>
+                    Get Directions
+                    <svg width="7" height="7" viewBox="0 0 8 8" fill="none"><path d="M1 7L7 1M7 1H2M7 1V6" stroke="currentColor" strokeWidth="1.3" /></svg>
+                  </span>
                 </div>
               </a>
             ))}

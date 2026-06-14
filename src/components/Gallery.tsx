@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform, useInView, type MotionValue } from 'framer-motion'
 
 const galleryImages = [
@@ -159,12 +159,22 @@ export default function Gallery() {
     offset: ['start end', 'end start'],
   })
 
+  // Desktop (≥1024) keeps the floating "universe". Phones + tablets get a
+  // clean stacked gallery so the images aren't tiny/sparse/scattered.
+  const [isDesktop, setIsDesktop] = useState(true)
+  useEffect(() => {
+    const calc = () => setIsDesktop(window.innerWidth >= 1024)
+    calc()
+    window.addEventListener('resize', calc)
+    return () => window.removeEventListener('resize', calc)
+  }, [])
+
   return (
     <section
       id="gallery"
       ref={outerRef}
       className="relative bg-black py-32 md:py-40 overflow-hidden"
-      style={{ minHeight: '180vh' }}
+      style={isDesktop ? { minHeight: '180vh' } : undefined}
     >
       {/* Deep space atmosphere */}
       <div className="absolute inset-0 pointer-events-none">
@@ -228,20 +238,49 @@ export default function Gallery() {
         </div>
       </div>
 
-      {/* Floating image universe */}
-      <div
-        className="relative mx-auto"
-        style={{ height: '100vh', maxWidth: '1400px' }}
-      >
-        {galleryImages.map((img, i) => (
-          <GalleryCard
-            key={img.src}
-            img={img}
-            index={i}
-            scrollYProgress={scrollYProgress}
-          />
-        ))}
-      </div>
+      {/* Floating image universe — desktop only */}
+      {isDesktop ? (
+        <div
+          className="relative mx-auto"
+          style={{ height: '100vh', maxWidth: '1400px' }}
+        >
+          {galleryImages.map((img, i) => (
+            <GalleryCard
+              key={img.src}
+              img={img}
+              index={i}
+              scrollYProgress={scrollYProgress}
+            />
+          ))}
+        </div>
+      ) : (
+        /* Mobile / tablet — clean stacked gallery (premium, no overlap) */
+        <div className="max-w-screen-md mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {galleryImages.map((img, i) => (
+            <motion.div
+              key={img.src}
+              initial={{ opacity: 0, y: 40, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-12%' }}
+              transition={{ duration: 0.9, delay: (i % 2) * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="relative overflow-hidden rounded-2xl"
+              style={{ boxShadow: '0 30px 70px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.05)' }}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                loading="lazy"
+                className="block w-full h-full object-cover"
+                style={{ aspectRatio: '4/3' }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent pointer-events-none" />
+              <span className="absolute bottom-3 left-4 font-josefin text-[8px] tracking-[0.4em] uppercase text-white/70">
+                {img.alt}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Bottom label */}
       <div className="max-w-screen-xl mx-auto px-6 md:px-10 mt-20">

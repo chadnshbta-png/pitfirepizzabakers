@@ -60,8 +60,21 @@ export default function Hero() {
     function draw(i: number) {
       const img = images[Math.max(0, Math.min(totalFrames - 1, Math.round(i)))]
       if (!img?.complete || !img.naturalWidth) return
-      ctx!.clearRect(0, 0, canvas.width, canvas.height)
-      ctx!.drawImage(img, 0, 0, canvas.width, canvas.height)
+      const cw = canvas.width, ch = canvas.height
+      ctx!.clearRect(0, 0, cw, ch)
+      // Landscape viewports (desktop / tablet-landscape) — unchanged stretch-fill.
+      // Portrait viewports (phones / tablets held upright) — cover-crop instead,
+      // so landscape frames aren't squished into an oval. Desktop is unaffected.
+      if (cw >= ch) {
+        ctx!.drawImage(img, 0, 0, cw, ch)
+      } else {
+        const ir = img.naturalWidth / img.naturalHeight
+        const cr = cw / ch
+        let dw: number, dh: number, dx: number, dy: number
+        if (ir > cr) { dh = ch; dw = ch * ir; dx = (cw - dw) / 2; dy = 0 }
+        else { dw = cw; dh = cw / ir; dx = 0; dy = (ch - dh) / 2 }
+        ctx!.drawImage(img, dx, dy, dw, dh)
+      }
     }
 
     draw(0)
