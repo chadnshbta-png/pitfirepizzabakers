@@ -3,10 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --primary: #D12626;
+  --primary: #C8102E;        /* Pizza Hut red — accent only */
+  --primary-dark: #8A0A20;
+  --ember: #E23744;
   --background: #000000;
   --foreground: #ffffff;
-  --gold: #C9A052;
 }
 
 * {
@@ -24,7 +25,7 @@ body {
   color: #ffffff;
   /* `clip` prevents horizontal overflow WITHOUT turning body into a scroll
      container (which `hidden` would, by forcing overflow-y:auto) — that scroll
-     container breaks `position: sticky` for descendants like the Locations scene. */
+     container would break `position: sticky` for pinned cinematic scenes. */
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -38,13 +39,13 @@ body {
   background: #0a0a0a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D12626;
+  background: var(--primary);
   border-radius: 2px;
 }
 
 /* Selection */
 ::selection {
-  background: #D12626;
+  background: var(--primary);
   color: #ffffff;
 }
 
@@ -53,7 +54,6 @@ body {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(300%); }
 }
-
 .animate-scroll-line {
   animation: scrollLine 2s ease-in-out infinite;
 }
@@ -71,7 +71,6 @@ body {
   z-index: 9999;
   animation: grain 8s steps(10) infinite;
 }
-
 @keyframes grain {
   0%, 100% { transform: translate(0, 0); }
   10% { transform: translate(-5%, -10%); }
@@ -85,30 +84,34 @@ body {
   90% { transform: translate(-10%, 10%); }
 }
 
-/* Video panel 3D */
-.video-panel {
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
+/* ── Glass surface ─────────────────────────────────────────────────── */
+.glass {
+  background: rgba(18, 12, 12, 0.45);
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.glass-strong {
+  background: rgba(14, 9, 9, 0.6);
+  backdrop-filter: blur(28px) saturate(130%);
+  -webkit-backdrop-filter: blur(28px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Menu card glow */
-.menu-card-glow {
-  box-shadow: 0 0 0 0 rgba(209, 38, 38, 0);
-  transition: box-shadow 0.5s ease;
-}
-.menu-card-glow:hover {
-  box-shadow: 0 0 60px 10px rgba(209, 38, 38, 0.15), 0 30px 60px rgba(0, 0, 0, 0.8);
+/* ── 3D helpers ────────────────────────────────────────────────────── */
+.perspective-1200 { perspective: 1200px; }
+.perspective-1600 { perspective: 1600px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+
+/* ── Drop shadow used on cut-out product PNGs ──────────────────────── */
+.product-shadow {
+  filter:
+    drop-shadow(0 40px 50px rgba(0, 0, 0, 0.75))
+    drop-shadow(0 0 90px rgba(200, 16, 46, 0.18));
 }
 
-/* Text reveal clip */
-.text-reveal-clip {
-  overflow: hidden;
-}
-.text-reveal-clip > * {
-  display: block;
-}
-
-/* Section divider */
+/* ── Section divider ──────────────────────────────────────────────── */
 .section-divider {
   width: 40px;
   height: 1px;
@@ -116,10 +119,8 @@ body {
   display: block;
 }
 
-/* Hover underline */
-.hover-underline {
-  position: relative;
-}
+/* ── Hover underline ──────────────────────────────────────────────── */
+.hover-underline { position: relative; }
 .hover-underline::after {
   content: '';
   position: absolute;
@@ -130,14 +131,31 @@ body {
   background: currentColor;
   transition: width 0.3s ease;
 }
-.hover-underline:hover::after {
-  width: 100%;
+.hover-underline:hover::after { width: 100%; }
+
+/* ── Floating / steam motion ──────────────────────────────────────── */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-18px) rotate(3deg); }
+}
+@keyframes spinSlow {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes steamRise {
+  0%   { transform: translateY(0) scaleX(1);   opacity: 0; }
+  18%  { opacity: 0.45; }
+  100% { transform: translateY(-130px) scaleX(2.4); opacity: 0; }
+}
+.steam-plume {
+  filter: blur(9px);
+  animation: steamRise 5.5s ease-out infinite;
 }
 
-/* Perspective container */
-.perspective-1200 {
-  perspective: 1200px;
-}
-.preserve-3d {
-  transform-style: preserve-3d;
+/* Gradient text */
+.text-gradient-red {
+  background: linear-gradient(180deg, #ffffff 0%, #ffd9dd 45%, var(--ember) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

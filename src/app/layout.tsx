@@ -18,9 +18,12 @@ const josefin = Josefin_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'Pitfire Pizza — Crafted to Inspire',
+  title: 'Pizza Hut — Crafted Fresh Daily',
   description:
-    '72 Hour Artisan Dough. Premium Ingredients. Unforgettable Flavor. Experience pizza reimagined.',
+    'Hand-stretched dough. Premium ingredients. Unforgettable flavor. Pizza Hut, reimagined as a cinematic experience.',
+  icons: {
+    icon: 'https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/fav_icon.png',
+  },
 }
 
 export default function RootLayout({
