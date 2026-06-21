@@ -1,260 +1,158 @@
 {
-  "data": {
-    "branding": {
-      "colorScheme": "light",
-      "fonts": [
-        {
-          "family": "OpenSans",
-          "role": "body"
-        },
-        {
-          "family": "SharpSansBold",
-          "role": "heading"
-        }
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "Suisse",
+      "role": "body"
+    }
+  ],
+  "colors": {
+    "primary": "#FF4C00",
+    "secondary": "#E56565",
+    "accent": "#FF4C00",
+    "background": "#F9F9F9",
+    "textPrimary": "#262626",
+    "link": "#FF4D00"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Suisse",
+      "heading": "Suisse"
+    },
+    "fontStacks": {
+      "heading": [
+        "Suisse",
+        "ui-sans-serif",
+        "system-ui",
+        "sans-serif",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji"
       ],
-      "colors": {
-        "primary": "#C8102E",
-        "secondary": "#007BFF",
-        "accent": "#C8102E",
-        "background": "#FFFFFF",
-        "textPrimary": "#000000",
-        "link": "#6C757D"
-      },
-      "typography": {
-        "fontFamilies": {
-          "primary": "OpenSans",
-          "heading": "SharpSansBold"
-        },
-        "fontStacks": {
-          "heading": [
-            "SharpSansBold"
-          ],
-          "body": [
-            "OpenSans"
-          ],
-          "paragraph": [
-            "OpenSans"
-          ]
-        },
-        "fontSizes": {
-          "h1": "18px",
-          "h2": "16px",
-          "body": "14px"
-        }
-      },
-      "spacing": {
-        "baseUnit": 4,
-        "borderRadius": "4px"
-      },
-      "components": {
-        "buttonPrimary": {
-          "background": "#C8102E",
-          "textColor": "#FFFFFF",
-          "borderColor": "#C8102E",
-          "borderRadius": "4px",
-          "borderRadiusCorners": {
-            "topLeft": "4px",
-            "topRight": "4px",
-            "bottomRight": "4px",
-            "bottomLeft": "4px"
-          },
-          "shadow": "none"
-        },
-        "buttonSecondary": {
-          "background": "#FFFFFF",
-          "textColor": "#000000",
-          "borderColor": "#DDDDDD",
-          "borderRadius": "4px",
-          "borderRadiusCorners": {
-            "topLeft": "4px",
-            "topRight": "4px",
-            "bottomRight": "4px",
-            "bottomLeft": "4px"
-          },
-          "shadow": "none"
-        }
-      },
-      "images": {
-        "logo": "https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/pizzahut-desktop-logo.svg",
-        "favicon": "https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/fav_icon.png",
-        "ogImage": null,
-        "logoHref": "/",
-        "logoAlt": "Pizza Hut"
-      },
-      "__llm_logo_reasoning": {
-        "selectedIndex": 0,
-        "reasoning": "Selected #0 because it is visible, located in the header, links to the homepage, and matches the brand name 'Pizza Hut'.",
-        "confidence": 0.95,
-        "source": "llm"
-      },
-      "__llm_button_reasoning": {
-        "primary": {
-          "index": 0,
-          "text": "See all deals & menus",
-          "reasoning": "Button #0 uses the brand's primary color (#C8102E), which is vibrant and aligns with the brand's identity. The text 'See all deals & menus' is action-oriented, making it the main call-to-action."
-        },
-        "secondary": {
-          "index": 1,
-          "text": "عربي",
-          "reasoning": "Button #1 has a different background color (#FFFFFF) and serves a secondary function (language selection), making it suitable as the secondary button."
-        },
-        "confidence": 0.95
-      },
-      "personality": {
-        "tone": "bold",
-        "energy": "high",
-        "targetAudience": "general public"
-      },
-      "designSystem": {
-        "framework": "bootstrap",
-        "componentLibrary": ""
-      },
-      "confidence": {
-        "buttons": 0.95,
-        "colors": 0.9,
-        "overall": 0.925
-      },
-      "__llm_metadata": {
-        "logoSelection": {
-          "llmCalled": true,
-          "llmSucceeded": true,
-          "finalSource": "llm",
-          "rawLogoSelection": {
-            "selectedLogoIndex": 0,
-            "selectedLogoReasoning": "Selected #0 because it is visible, located in the header, links to the homepage, and matches the brand name 'Pizza Hut'.",
-            "confidence": 0.95
-          }
-        },
-        "buttonClassification": {
-          "llmCalled": true,
-          "llmSucceeded": true
-        }
-      }
+      "body": [
+        "Suisse",
+        "ui-sans-serif",
+        "system-ui",
+        "sans-serif",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji"
+      ],
+      "paragraph": [
+        "Suisse",
+        "ui-sans-serif",
+        "system-ui",
+        "sans-serif",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji"
+      ]
     },
-    "metadata": {
-      "viewport": "width=device-width, initial-scale=1, maximum-scale=5",
-      "description": "Explore delicious pizzas and more at Pizza Hut! Order online for delivery or dine-in at your nearest location. Discover deals, rewards, and convenience today.",
-      "title": "Home | Pizza Hut Jeddah",
-      "language": "en",
-      "google-site-verification": "NikeWy9Sd9QVla9ji2GHk7RNIBQGFBglrZH2lu-k6sE",
-      "keywords": " Pizza Hut, Pizza Hut Jeddah, Pizzahut, Pizzahut Jeddah, Choose 2's Medium, Pizza Pasta Deal,New Bacon, Avo, Feta, Tikka veg, Chicken Supreme,BBQ Meat Lovers, CHICKEN ,SUPREME,CHICKEN SUPREME,VERY VEGGIE,SEAFOOD SUPREME,CLASSIC PEPPERONI,CLASSIC MARGHERITA,CHICKEN ALFREDO, FOOTLONG LASAGNA CHICKEN, FOOTLONG LASAGNA BEEF,GARLIC BREAD,POTATO WEDGES,FRENCH FRIES,SALAD,HOME SALAD BAR,best,best pizza, pizza,pizza delivery,pasta,starters,crust,stuffed,salad",
-      "favicon": "https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/fav_icon.png",
-      "scrapeId": "019edf4f-5dd6-75fe-8afe-1dc4eb31f531",
-      "sourceURL": "https://www.jeddah.pizzahut.me/",
-      "url": "https://www.jeddah.pizzahut.me/",
-      "statusCode": 200,
-      "contentType": "text/html; charset=UTF-8",
-      "timezone": "America/New_York",
-      "proxyUsed": "basic",
-      "indexId": "3bc1e93a-162b-4498-9293-ef0ff9205c13",
-      "creditsUsed": 5,
-      "concurrencyLimited": false
-    },
-    "html": "<!DOCTYPE html><html lang=\"en\">\n<body>\n  <!-- Google Tag Manager (noscript) -->\n  \n  <!-- End Google Tag Manager (noscript) -->\n  <div id=\"fb-root\"></div>\n  <div class=\"loader-container d-none\" id=\"loader\">\n    <img class=\"loader-img my-auto\" width=\"auto\" height=\"auto\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/delivery.gif\" alt=\"loader-img\">\n  </div>\n  \n  <app-root _nghost-serverapp-c31=\"\" ng-version=\"13.3.12\"><div _ngcontent-serverapp-c31=\"\" id=\"loader-gif\" class=\"loader-container d-none\"><!----><img _ngcontent-serverapp-c31=\"\" width=\"3rem\" height=\"3rem\" alt=\"loader-img\" class=\"loader-img my-auto\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/delivery.gif\"><!----></div><div _ngcontent-serverapp-c31=\"\" dir=\"ltr\"><router-outlet _ngcontent-serverapp-c31=\"\"></router-outlet><app-new-home _nghost-serverapp-c47=\"\"><app-call-to-order _ngcontent-serverapp-c47=\"\" _nghost-serverapp-c33=\"\"><!----><!----><!----><!----></app-call-to-order><!----><div _ngcontent-serverapp-c47=\"\" class=\"ph_fixed_header\"><app-header _ngcontent-serverapp-c47=\"\" _nghost-serverapp-c42=\"\"><div _ngcontent-serverapp-c42=\"\" class=\"pht-top-header bg-white header-lg\" dir=\"ltr\"><div _ngcontent-serverapp-c42=\"\" class=\"container pht-top-header-container\"><a _ngcontent-serverapp-c42=\"\" routerlink=\"/\" hreflang=\"en\" href=\"https://www.jeddah.pizzahut.me/\"><div _ngcontent-serverapp-c42=\"\" class=\"header-logo\"><img _ngcontent-serverapp-c42=\"\" loading=\"lazy\" width=\"100%\" height=\"100%\" class=\"hover logo-left outline-none\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/pizzahut-desktop-logo.svg\" alt=\"Pizza Hut\"></div></a><!----><div _ngcontent-serverapp-c42=\"\" class=\"header-links mb-0\"><div _ngcontent-serverapp-c42=\"\" class=\"location-info\" style=\"display: contents;\"><div _ngcontent-serverapp-c42=\"\" class=\"order-mode w-auto\"><!----><!----><!----><!----><!----></div><div _ngcontent-serverapp-c42=\"\" class=\"order-from linerestriction\"><!----><span _ngcontent-serverapp-c42=\"\"><img _ngcontent-serverapp-c42=\"\" loading=\"lazy\" alt=\"Location Selector\" class=\"img-fluid img-icon mr-2\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/Icons/location.svg\"><span _ngcontent-serverapp-c42=\"\" class=\"stre-loc\"><span _ngcontent-serverapp-c42=\"\" class=\"f-600 outline-none header-text choose-location\">Choose Location</span></span></span><!----></div><!----><!----><!----></div><!----><div _ngcontent-serverapp-c42=\"\" class=\"mr-2 d-none\"><select _ngcontent-serverapp-c42=\"\" class=\"form-control ng-untouched ng-pristine ng-valid\"><option _ngcontent-serverapp-c42=\"\" value=\"4\">English</option><option _ngcontent-serverapp-c42=\"\" value=\"5\">عربي</option><!----></select></div><!----><div _ngcontent-serverapp-c42=\"\" class=\"mr-2\"><label _ngcontent-serverapp-c42=\"\" class=\"lang-btn d-none\"> English</label><label _ngcontent-serverapp-c42=\"\" class=\"lang-btn\"> عربي</label><!----></div><!----><div _ngcontent-serverapp-c42=\"\" class=\"Delivery-time\"></div><!----><div _ngcontent-serverapp-c42=\"\" class=\"Account-info\"><img _ngcontent-serverapp-c42=\"\" alt=\"Account\" width=\"100%\" height=\"100%\" class=\"img-fluid img-icon mr-2\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/Icons/Account.svg\"><!----><span _ngcontent-serverapp-c42=\"\"><span _ngcontent-serverapp-c42=\"\" id=\"signIn\" class=\"hover header-text\">SIGN IN</span><span _ngcontent-serverapp-c42=\"\"> / </span><span _ngcontent-serverapp-c42=\"\" id=\"registerInHeader\" class=\"hover header-text\">REGISTER</span></span><!----><!----></div><!----><!----><!----><!----></div></div></div><!----><!----><div _ngcontent-serverapp-c42=\"\" id=\"cartcontainer\" class=\"cart-message-container d-none\" dir=\"ltr\"><div _ngcontent-serverapp-c42=\"\" id=\"cartAddedMessage\" class=\"cart-message hide\"> Item added to cart successfully </div></div><div _ngcontent-serverapp-c42=\"\" id=\"itemRemovedIntent\" class=\"cart-message-container d-none\" dir=\"ltr\"><div _ngcontent-serverapp-c42=\"\" id=\"itemRemovedMessage\" class=\"cart-message backend_itemRemove hide\"> Sorry, one or more items in the backend cart are not available at the moment. Your cart is updated. </div></div><!----><!----><!----><app-configurations _ngcontent-serverapp-c42=\"\" _nghost-serverapp-c34=\"\"></app-configurations><!----></app-header></div><!----><div _ngcontent-serverapp-c47=\"\"><!----><div _ngcontent-serverapp-c47=\"\" class=\"old_optimize_layout pt_55 carousel-spl-hr\"><!----><div _ngcontent-serverapp-c47=\"\" class=\"container-fluid\" dir=\"ltr\"><div _ngcontent-serverapp-c47=\"\" class=\"row\"><!----><div _ngcontent-serverapp-c47=\"\" class=\"col-12 pht-banner px-0\"><div _ngcontent-serverapp-c47=\"\"><img _ngcontent-serverapp-c47=\"\" width=\"100%\" height=\"100%\" id=\"imgherosrc\" alt=\"Hero Banner\" loading=\"lazy\" class=\"pht-banner-img pht-banner-lg\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/banners/hero/english85687.jpg\" dir=\"ltr\"><!----><img _ngcontent-serverapp-c47=\"\" width=\"100%\" height=\"100%\" id=\"imgherosrcipad\" alt=\"Hero Banner\" loading=\"lazy\" class=\"pht-banner-img pht-banner-md\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/banners/hero/english85687.jpg\" dir=\"ltr\"><!----><!----></div><!----><!----></div></div></div><!----><!----><div _ngcontent-serverapp-c47=\"\" class=\"container text-left\" dir=\"ltr\"><!----><!----><div _ngcontent-serverapp-c47=\"\" class=\"categoryCardsHeader categoryCardsHeader-carousel\"><div _ngcontent-serverapp-c47=\"\" class=\"sub-title borderDecoration\"><b _ngcontent-serverapp-c47=\"\">Explore Our Menu</b></div><div _ngcontent-serverapp-c47=\"\" class=\"hover sub-title\"><b _ngcontent-serverapp-c47=\"\">View All </b><i _ngcontent-serverapp-c47=\"\" class=\"fas fa-chevron-right\" style=\"color: #c31626;\"></i></div></div><!----><div _ngcontent-serverapp-c47=\"\" class=\"card-container\"><div _ngcontent-serverapp-c47=\"\" class=\"categoryItem\"><div _ngcontent-serverapp-c47=\"\" class=\"category-card\"><div _ngcontent-serverapp-c47=\"\" class=\"card-content\"><div _ngcontent-serverapp-c47=\"\" class=\"circle-container\"><img _ngcontent-serverapp-c47=\"\" class=\"circle-image\" alt=\"Deals\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/deals3061.jpg\"></div><div _ngcontent-serverapp-c47=\"\" class=\"category-name\">Deals</div></div></div></div><!----><!----><div _ngcontent-serverapp-c47=\"\" class=\"categoryItem\"><div _ngcontent-serverapp-c47=\"\" class=\"category-card\"><div _ngcontent-serverapp-c47=\"\" class=\"card-content\"><div _ngcontent-serverapp-c47=\"\" class=\"circle-container\"><img _ngcontent-serverapp-c47=\"\" class=\"circle-image\" alt=\"Pizzas\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/pizzas4945.png\"></div><div _ngcontent-serverapp-c47=\"\" class=\"category-name\">Pizzas</div></div></div></div><!----><!----><div _ngcontent-serverapp-c47=\"\" class=\"categoryItem\"><div _ngcontent-serverapp-c47=\"\" class=\"category-card\"><div _ngcontent-serverapp-c47=\"\" class=\"card-content\"><div _ngcontent-serverapp-c47=\"\" class=\"circle-container\"><img _ngcontent-serverapp-c47=\"\" class=\"circle-image\" alt=\"Melts\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/melts4548.png\"></div><div _ngcontent-serverapp-c47=\"\" class=\"category-name\">Melts</div></div></div></div><!----><!----><div _ngcontent-serverapp-c47=\"\" class=\"categoryItem\"><div _ngcontent-serverapp-c47=\"\" class=\"category-card\"><div _ngcontent-serverapp-c47=\"\" class=\"card-content\"><div _ngcontent-serverapp-c47=\"\" class=\"circle-container\"><img _ngcontent-serverapp-c47=\"\" class=\"circle-image\" alt=\"Sides\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/sides3982.png\"></div><div _ngcontent-serverapp-c47=\"\" class=\"category-name\">Sides</div></div></div></div><!----><!----><div _ngcontent-serverapp-c47=\"\" class=\"categoryItem\"><div _ngcontent-serverapp-c47=\"\" class=\"category-card\"><div _ngcontent-serverapp-c47=\"\" class=\"card-content\"><div _ngcontent-serverapp-c47=\"\" class=\"circle-container\"><img _ngcontent-serverapp-c47=\"\" class=\"circle-image\" alt=\"Wings\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/wings7546.png\"></div><div _ngcontent-serverapp-c47=\"\" class=\"category-name\">Wings</div></div></div></div><!----><!----><div _ngcontent-serverapp-c47=\"\" class=\"categoryItem\"><div _ngcontent-serverapp-c47=\"\" class=\"category-card\"><div _ngcontent-serverapp-c47=\"\" class=\"card-content\"><div _ngcontent-serverapp-c47=\"\" class=\"circle-container\"><img _ngcontent-serverapp-c47=\"\" class=\"circle-image\" alt=\"Pastas\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/pastas4009.png\"></div><div _ngcontent-serverapp-c47=\"\" class=\"category-name\">Pastas</div></div></div></div><!----><!----><!----></div><!----><div _ngcontent-serverapp-c47=\"\" class=\"deals-container tile-display\" style=\"display: block;\"><div _ngcontent-serverapp-c47=\"\" class=\"my-2\"><div _ngcontent-serverapp-c47=\"\" class=\"main-heading\"><h1 _ngcontent-serverapp-c47=\"\" class=\"title-secondary\">Our Most Popular Deals</h1></div></div><!----><!----><div _ngcontent-serverapp-c47=\"\" class=\"ofrs-container\"><div _ngcontent-serverapp-c47=\"\" class=\"ofrs-img text-center\"><img _ngcontent-serverapp-c47=\"\" width=\"100%\" height=\"100%\" loading=\"lazy\" id=\"imgtile1\" alt=\"Tile One\" class=\"img-fluid rounded hover\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/banners/tile-one/english14996.jpg\"></div><div _ngcontent-serverapp-c47=\"\" class=\"ofrs-img text-center\"><img _ngcontent-serverapp-c47=\"\" width=\"100%\" height=\"100%\" loading=\"lazy\" id=\"imgtile2\" alt=\"Tile Two\" class=\"img-fluid rounded hover\" src=\"https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/banners/tile-two/english67908.jpg\"></div></div><button _ngcontent-serverapp-c47=\"\" data-toggle=\"modal\" data-target=\"#splHourPopup\" class=\"btn btn-green w-100 my-3\">See all deals &amp; menus</button></div><!----></div><!----></div><button _ngcontent-serverapp-c47=\"\" type=\"button\" id=\"popup\" data-toggle=\"modal\" data-target=\"#myModal\" class=\"btn btn-info btn-lg\" style=\"display: none;\"></button><!----><button _ngcontent-serverapp-c47=\"\" data-toggle=\"modal\" id=\"none\" data-target=\"#futureOrder\" class=\"d-none\"></button><app-footer _ngcontent-serverapp-c47=\"\" _nghost-serverapp-c46=\"\"><app-configurations _ngcontent-serverapp-c46=\"\" _nghost-serverapp-c34=\"\"></app-configurations><div _ngcontent-serverapp-c46=\"\" class=\"piz-footer\" dir=\"ltr\"><div _ngcontent-serverapp-c46=\"\" class=\"container text-left\"><div _ngcontent-serverapp-c46=\"\" class=\"row top-header justify-content-between\"><!----><div _ngcontent-serverapp-c46=\"\" class=\"col-md-auto col-sm-12\"><h2 _ngcontent-serverapp-c46=\"\" aria-label=\"Menu\" class=\"sub-title\">Menu</h2><ul _ngcontent-serverapp-c46=\"\" class=\"footer-links px-0\"><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"hover foo_nav-link\"> Deals </span></li><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"hover foo_nav-link\"> Pizzas </span></li><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"hover foo_nav-link\"> Melts </span></li><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"hover foo_nav-link\"> Sides </span></li><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"hover foo_nav-link\"> Wings </span></li><!----><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" rel=\"noopener\" target=\"_blank\" class=\"foo_nav-link\"> Calories </span></li><!----><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" rel=\"noopener\" target=\"_blank\" class=\"foo_nav-link\">  </span></li><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" rel=\"noopener\" target=\"_blank\" class=\"foo_nav-link\"> Allergens </span></li><!----><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" rel=\"noopener\" target=\"_blank\" class=\"foo_nav-link\"> Nutrition &amp; Allergies </span></li><!----><!----></ul></div><div _ngcontent-serverapp-c46=\"\" class=\"col-md-auto col-sm-12\"><h2 _ngcontent-serverapp-c46=\"\" class=\"sub-title\">About Us</h2><ul _ngcontent-serverapp-c46=\"\" class=\"footer-links px-0\"><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" rel=\"noopener\" target=\"_blank\" class=\"foo_nav-link\">About  Pizza Hut <!----><span _ngcontent-serverapp-c46=\"\">Jeddah</span><!----></span></li><li _ngcontent-serverapp-c46=\"\"><!----></li><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"foo_nav-link\">Pizza Hut Near Me </span></li><!----></ul><!----><!----></div><div _ngcontent-serverapp-c46=\"\" class=\"col-md-auto col-sm-12\"><h2 _ngcontent-serverapp-c46=\"\" class=\"sub-title\">Policies</h2><ul _ngcontent-serverapp-c46=\"\" class=\"footer-links px-0\"><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"foo_nav-link\">Privacy Policy</span></li><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"foo_nav-link\">Terms of Use</span></li><!----><!----><!----><!----></ul></div><div _ngcontent-serverapp-c46=\"\" class=\"col-md-auto col-sm-12\"><h2 _ngcontent-serverapp-c46=\"\" class=\"sub-title\">Customer Service</h2><ul _ngcontent-serverapp-c46=\"\" class=\"footer-links px-0\"><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"foo_nav-link\">Contact Pizza Hut <!----><span _ngcontent-serverapp-c46=\"\">Jeddah</span><!----></span></li><li _ngcontent-serverapp-c46=\"\"><span _ngcontent-serverapp-c46=\"\" class=\"foo_nav-link\">FAQs</span></li></ul></div><div _ngcontent-serverapp-c46=\"\" class=\"col-md-auto col-sm-12 d-none d-md-block\"><div _ngcontent-serverapp-c46=\"\" class=\"old_optimize_layout\"><!----><ul _ngcontent-serverapp-c46=\"\" class=\"footer-links px-0 mb-1\"><!----><!----></ul></div><!----><ul _ngcontent-serverapp-c46=\"\" class=\"footer-links px-0\"><!---->&nbsp; <!---->&nbsp; <!---->&nbsp; <!---->&nbsp; <!----><!----><!----></ul></div><!----></div></div><div _ngcontent-serverapp-c46=\"\" class=\"bottom-footer\"><div _ngcontent-serverapp-c46=\"\" class=\"text-center\"><p _ngcontent-serverapp-c46=\"\" class=\"mb-0\"><small _ngcontent-serverapp-c46=\"\">©&nbsp;2026&nbsp;Yum! III (UK) Ltd. All rights reserved.</small><!----><!----></p></div></div></div></app-footer><!----></div><!----><app-configurations _ngcontent-serverapp-c47=\"\" _nghost-serverapp-c34=\"\"></app-configurations></app-new-home><!----></div><!----></app-root>\n  \n  <!-- Google Tag Manager -->\n  \n\n<!-- Google Tag Manager (noscript) -->\n\n  <link rel=\"prefetch\" as=\"font\" href=\"https: d2l1qb2xg9gi7w.cloudfront.net=\"\" fonts=\"\" opensans=\"\" opensans-regular.woff2\" type=\"font/woff2\"  crossorigin=\"anonymous\">\n  <link rel=\"prefetch\" as=\"font\" href=\"https: d2l1qb2xg9gi7w.cloudfront.net=\"\" fonts=\"\" sharpsansbold=\"\" sharpsansdispno1-bold.woff\" type=\"font/woff2\"  crossorigin=\"anonymous\">\n  <link rel=\"prefetch\" as=\"font\" href=\"https: d2l1qb2xg9gi7w.cloudfront.net=\"\" fonts=\"\" sharpsanssemibold=\"\" sharpsansdispno1-semibold.woff2\" type=\"font/woff2\"  crossorigin=\"anonymous\">\n  \n\n\n\n\n\n\n\n</link rel=\"prefetch\" as=\"font\" href=\"https:></link rel=\"prefetch\" as=\"font\" href=\"https:></link rel=\"prefetch\" as=\"font\" href=\"https:>\n</body></html>",
-    "images": [
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/deals3061.jpg",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/delivery.gif",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/banners/hero/english85687.jpg",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/pizzas4945.png",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/banners/tile-one/english14996.jpg",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/banners/tile-two/english67908.jpg",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/sides3982.png",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/pizzahut-desktop-logo.svg",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/pastas4009.png",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/Icons/location.svg",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/wings7546.png",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/qa/images/home_category_image/melts4548.png",
-      "https://d2l1qb2xg9gi7w.cloudfront.net/jd/web-static-images/Icons/Account.svg"
-    ],
-    "json": {
-      "company_name": "Pizza Hut",
-      "company_description": "Pizza Hut Jeddah offers a variety of pizzas, sides, and deals. Customers can choose their location, explore the menu, and access customer service."
+    "fontSizes": {
+      "h1": "60px",
+      "h2": "52px",
+      "body": "16px"
     }
   },
-  "scrape_id": "019edf4f-5dd6-75fe-8afe-1dc4eb31f531",
-  "id": "uRkGnQgkYApJ4_fzJs0pI",
-  "startedAt": "2026-06-19T09:56:20.599Z",
-  "endedAt": "2026-06-19T09:56:29.631Z",
-  "endpoint": "scrape",
-  "formState": {
-    "parseFile": null,
-    "parseFileMeta": null,
-    "extractSetupCompleted": false,
-    "urls": [],
-    "extractSchema": {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "company_mission": {
-          "type": "string"
-        },
-        "supports_sso": {
-          "type": "boolean"
-        },
-        "is_open_source": {
-          "type": "boolean"
-        },
-        "is_in_yc": {
-          "type": "boolean"
-        }
-      }
-    },
-    "extractPrompt": "Extract the company details, following the schema.",
-    "enableWebSearch": false,
-    "constrainUrls": false,
-    "options": {
-      "onlyMainContent": true,
-      "parsePDF": true,
-      "stealthMode": false,
-      "excludeTags": [],
-      "includeTags": [],
-      "waitFor": "",
-      "timeout": "",
-      "maxAge": "2 days",
-      "ignoreSitemap": false,
-      "crawlEntireDomain": false,
-      "sitemap": "include",
-      "limit": "10",
-      "maxDepth": "",
-      "excludePaths": [],
-      "includePaths": [],
-      "includeSubdomains": false,
-      "search": "",
-      "scrapeContentFromSearchResults": true,
-      "timeBasedSearch": "",
-      "location": "",
-      "prompt": ""
-    },
-    "formats": [
-      "html",
-      "json",
-      "branding",
-      "images"
-    ],
-    "sources": [
-      "web"
-    ],
-    "categories": [],
-    "jsonSchema": {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "company_name": {
-          "type": "string"
-        },
-        "company_description": {
-          "type": "string"
-        }
-      }
-    },
-    "jsonPrompt": "",
-    "questionPrompt": "",
-    "highlightsQuery": "",
-    "agent": {},
-    "url": "www.jeddah.pizzahut.me/",
-    "endpoint": "scrape"
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "5px"
   },
-  "status": "success",
-  "version": "DEYdiVuoRkgMI7bJE2_yn",
-  "isPreview": false
+  "components": {
+    "input": {
+      "background": "transparent",
+      "textColor": "#262626",
+      "borderColor": null,
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    },
+    "buttonPrimary": {
+      "background": "#FF4C00",
+      "textColor": "#FFFFFF",
+      "borderRadius": "10px",
+      "borderRadiusCorners": {
+        "topLeft": "10px",
+        "topRight": "10px",
+        "bottomRight": "10px",
+        "bottomLeft": "10px"
+      },
+      "shadow": "color(display-p3 0.9804 0.1127 0.098 / 0.2) 0px -6px 12px 0px inset, color(display-p3 0.9804 0.3647 0.098 / 0.12) 0px 2px 4px 0px, color(display-p3 0.9804 0.3647 0.098 / 0.12) 0px 1px 1px 0px, color(display-p3 0.9804 0.3647 0.098 / 0.16) 0px 0.5px 0.5px 0px, color(display-p3 0.9804 0.3647 0.098 / 0.2) 0px 0.25px 0.25px 0px"
+    },
+    "buttonSecondary": {
+      "background": "#EFEFEF",
+      "textColor": "#262626",
+      "borderRadius": "8px",
+      "borderRadiusCorners": {
+        "topLeft": "8px",
+        "topRight": "8px",
+        "bottomRight": "8px",
+        "bottomLeft": "8px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "data:image/svg+xml;utf8,%3Csvg%20fill%3D%22none%22%20height%3D%2215%22%20viewBox%3D%220%200%2079%2015%22%20width%3D%2279%22%20class%3D%22text-accent-black%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20data-fc-idx%3D%220%22%3E%3Cpath%20d%3D%22M0.599609%2014.4311V0.576888H9.45474V2.59564H2.87778V6.61335H8.30575V8.57272H2.87778V14.4311H0.599609Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3Cpath%20d%3D%22M11.9737%202.87272C11.2407%202.87272%2010.6663%202.33835%2010.6663%201.58626C10.6663%200.83418%2011.2407%200.299805%2011.9737%200.299805C12.7067%200.299805%2013.2812%200.83418%2013.2812%201.58626C13.2812%202.33835%2012.7067%202.87272%2011.9737%202.87272ZM10.8842%2014.4311V4.29772H13.0237V14.4311H10.8842Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3Cpath%20d%3D%22M20.1527%204.29772H20.6281V6.29668H19.6772C17.7755%206.29668%2017.1613%207.78105%2017.1613%209.3446V14.4311H15.0219V4.29772H16.9236L17.1613%205.82168C17.6764%204.97064%2018.4886%204.29772%2020.1527%204.29772Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3Cpath%20d%3D%22M26.1788%2014.5498C22.9894%2014.5498%2020.9886%2012.4915%2020.9886%209.38418C20.9886%206.2571%2022.9894%204.17897%2025.9807%204.17897C28.9126%204.17897%2030.8738%206.03939%2030.9333%209.00814C30.9333%209.26543%2030.9135%209.54251%2030.8738%209.8196H23.2271V9.95814C23.2865%2011.68%2024.3761%2012.8081%2026.06%2012.8081C27.3674%2012.8081%2028.3183%2012.155%2028.6155%2011.0269H30.755C30.3984%2013.0258%2028.6947%2014.5498%2026.1788%2014.5498ZM23.3064%208.25605H28.7145C28.5362%206.75189%2027.4863%205.90085%2026.0005%205.90085C24.6336%205.90085%2023.4648%206.81126%2023.3064%208.25605Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3Cpath%20d%3D%22M37.2193%2014.5498C34.1487%2014.5498%2032.1875%2012.5508%2032.1875%209.38418C32.1875%206.2571%2034.2081%204.17897%2037.2787%204.17897C39.8936%204.17897%2041.5181%205.62376%2041.9341%207.9196H39.6955C39.4182%206.7321%2038.5664%205.9998%2037.2391%205.9998C35.5156%205.9998%2034.3864%207.38522%2034.3864%209.38418C34.3864%2011.3633%2035.5156%2012.729%2037.2391%2012.729C38.5465%2012.729%2039.4182%2011.9769%2039.6757%2010.8092H41.9341C41.5379%2013.105%2039.8144%2014.5498%2037.2193%2014.5498Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3Cpath%20d%3D%22M48.6034%204.29772H49.0789V6.29668H48.128C46.2262%206.29668%2045.6121%207.78105%2045.6121%209.3446V14.4311H43.4726V4.29772H45.3744L45.6121%205.82168C46.1272%204.97064%2046.9394%204.29772%2048.6034%204.29772Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3Cpath%20d%3D%22M54.3679%204.17897C57.0621%204.17897%2058.6073%205.46543%2058.6073%207.86022V14.4311H56.7451L56.5668%2012.9863C55.8735%2013.8967%2054.9028%2014.5498%2053.2981%2014.5498C51.0794%2014.5498%2049.5936%2013.4613%2049.5936%2011.5811C49.5936%209.50293%2051.0992%208.33522%2053.9519%208.33522H56.4876V7.72168C56.4876%206.59355%2055.6754%205.90085%2054.2688%205.90085C53.001%205.90085%2052.1491%206.4946%2051.9907%207.38522H49.8908C50.1087%205.40605%2051.8124%204.17897%2054.3679%204.17897ZM53.6547%2012.8873C55.4376%2012.8873%2056.4678%2011.8383%2056.4876%2010.2748V9.91855H53.833C52.5057%209.91855%2051.7728%2010.4133%2051.7728%2011.4425C51.7728%2012.2936%2052.4859%2012.8873%2053.6547%2012.8873Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3Cpath%20d%3D%22M62.7912%2014.4311L59.4829%204.29772H61.7413L64.0591%2012.0561L66.3768%204.29772H68.3381L70.5568%2012.0561L72.9538%204.29772H75.1329L71.7652%2014.4311H69.4672L67.3277%207.54355L65.109%2014.4311H62.7912Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3Cpath%20d%3D%22M76.1601%2014.4311V0.576888H78.2996V14.4311H76.1601Z%22%20fill%3D%22currentColor%22%20style%3D%22fill%3A%20color(display-p3%200.14902%200.14902%200.14902)%20!important%3B%22%2F%3E%3C%2Fsvg%3E",
+    "favicon": "https://www.firecrawl.dev/favicon.png",
+    "ogImage": "https://www.firecrawl.dev/og.png",
+    "logoHref": "/"
+  },
+  "__llm_logo_reasoning": {
+    "selectedIndex": 3,
+    "reasoning": "Selected #1 because it is visible, located in the header, links to the homepage, and matches the brand inferred from the URL and page title.",
+    "confidence": 0.85,
+    "source": "llm"
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 0,
+      "text": "Start for free",
+      "reasoning": "Button #2 ('Start for free') uses the vibrant brand color #FF4C00, which aligns with the primary brand color and has action-oriented text, making it the main call-to-action."
+    },
+    "secondary": {
+      "index": 1,
+      "text": "Sign up",
+      "reasoning": "Button #0 ('Sign up') has a different background color (#EFEFEF) and serves as a secondary action with supportive text."
+    },
+    "confidence": 0.95
+  },
+  "personality": {
+    "tone": "modern",
+    "energy": "high",
+    "targetAudience": "developers and tech companies"
+  },
+  "designSystem": {
+    "framework": "tailwind",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0.95,
+    "colors": 0.9,
+    "overall": 0.925
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": true,
+      "llmSucceeded": true,
+      "finalSource": "llm",
+      "rawLogoSelection": {
+        "selectedLogoIndex": 1,
+        "selectedLogoReasoning": "Selected #1 because it is visible, located in the header, links to the homepage, and matches the brand inferred from the URL and page title.",
+        "confidence": 0.85
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": true,
+      "llmSucceeded": true
+    }
+  }
 }

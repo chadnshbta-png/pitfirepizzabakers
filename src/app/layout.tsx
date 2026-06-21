@@ -1,19 +1,17 @@
 import type { Metadata } from 'next'
-import { Cormorant_Garamond, Josefin_Sans } from 'next/font/google'
+import { Hanken_Grotesk } from 'next/font/google'
 import './globals.css'
 import SmoothScroll from '@/components/SmoothScroll'
 
-const cormorant = Cormorant_Garamond({
-  weight: ['300', '400', '500', '600', '700'],
+/* Brand typography — "Suisse" per Branding.json is a paid face we can't load,
+   so we substitute Hanken Grotesk: a clean neo-grotesque with the same modern,
+   high-energy, neutral character. One family for heading + body, exactly as the
+   config specifies. The legacy --font-cormorant / --font-josefin variables are
+   re-pointed to it so existing utility classes resolve to the brand sans. */
+const sans = Hanken_Grotesk({
+  weight: ['300', '400', '500', '600', '700', '800'],
   subsets: ['latin'],
-  variable: '--font-cormorant',
-  display: 'swap',
-})
-
-const josefin = Josefin_Sans({
-  weight: ['100', '200', '300', '400', '600', '700'],
-  subsets: ['latin'],
-  variable: '--font-josefin',
+  variable: '--font-sans',
   display: 'swap',
 })
 
@@ -32,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${josefin.variable}`}>
+    <html lang="en" className={sans.variable}>
       <body className="grain">
         <SmoothScroll>{children}</SmoothScroll>
       </body>

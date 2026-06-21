@@ -5,6 +5,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Pepperoni, Basil, Tomato, Olive, Cheese } from './ingredients'
 import { signaturePizza } from '@/data/menuItems'
+import SectionAmbient from './SectionAmbient'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -34,6 +35,7 @@ export default function SignatureExperience() {
     const ctx = gsap.context(() => {
       const pizza = root.querySelector('[data-pizza]') as HTMLElement
       const plate = root.querySelector('[data-plate]') as HTMLElement
+      const glow = root.querySelector('[data-glow]') as HTMLElement
       const chips = gsap.utils.toArray<HTMLElement>('[data-chip]', root)
       const title = root.querySelector('[data-title]') as HTMLElement
       const sub = root.querySelector('[data-sub]') as HTMLElement
@@ -65,20 +67,25 @@ export default function SignatureExperience() {
         },
       })
 
-      // 1 — zoom in + title
-      tl.fromTo(pizza, { scale: 0.82, rotate: -6 }, { scale: 1.06, rotate: 0, duration: 1 }, 0)
-        .fromTo(plate, { scale: 0.7, opacity: 0.3 }, { scale: 1, opacity: 1, duration: 1 }, 0)
+      // 1 — camera pushes in hard from the deep, title rises
+      tl.fromTo(pizza, { scale: 0.58, rotate: -10, z: -340, rotateX: 14 }, { scale: 1.06, rotate: 0, z: 0, rotateX: 0, duration: 1 }, 0)
+        .fromTo(plate, { scale: 0.6, opacity: 0.2 }, { scale: 1, opacity: 1, duration: 1 }, 0)
+        .fromTo(glow, { opacity: 0.3, scale: 0.8 }, { opacity: 0.8, scale: 1, duration: 1 }, 0)
         .to(title, { opacity: 1, y: 0, duration: 0.6 }, 0.15)
 
-      // 2 — separate the toppings (build "layer by layer")
-      tl.to(pizza, { scale: 1.2, rotate: 9, duration: 1 }, 1)
+      // 2 — separate the toppings in 3D (build "layer by layer", lifting toward
+      //     camera) while the camera tilts down over the deconstruction
+      tl.to(pizza, { scale: 1.28, rotate: 9, rotateX: -10, duration: 1 }, 1)
         .to(plate, { rotate: 30, duration: 1.4 }, 1)
+        .to(glow, { opacity: 1, scale: 1.2, duration: 1 }, 1)
       chips.forEach((c, i) => {
         tl.to(c, {
           x: parseFloat(c.dataset.sepx!) * travel,
           y: parseFloat(c.dataset.sepy!) * travel,
-          rotate: gsap.utils.random(-60, 60),
-          scale: 1.3,
+          z: 120 + i * 26,
+          rotateX: gsap.utils.random(-40, 40),
+          rotateZ: gsap.utils.random(-60, 60),
+          scale: 1.35,
           duration: 0.9,
         }, 1 + i * 0.05)
       })
@@ -86,9 +93,10 @@ export default function SignatureExperience() {
         .to(sub, { opacity: 1, y: 0, duration: 0.6 }, 1.4)
 
       // 3 — reassemble
-      tl.to(pizza, { scale: 1.04, rotate: -4, duration: 1 }, 2.4)
+      tl.to(pizza, { scale: 1.04, rotate: -4, rotateX: 0, duration: 1 }, 2.4)
+        .to(glow, { opacity: 0.75, scale: 1, duration: 1 }, 2.4)
       chips.forEach((c, i) => {
-        tl.to(c, { x: 0, y: 0, rotate: 0, scale: 1, duration: 0.9 }, 2.4 + i * 0.04)
+        tl.to(c, { x: 0, y: 0, z: 0, rotateX: 0, rotateZ: 0, scale: 1, duration: 0.9 }, 2.4 + i * 0.04)
       })
       tl.to(sub, { opacity: 0, y: -30, duration: 0.5 }, 2.5)
 
@@ -101,23 +109,46 @@ export default function SignatureExperience() {
   }, [])
 
   return (
-    <section ref={sectionRef} id="signature" className="relative bg-black">
-      <div data-stage className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-black">
-        {/* deep red vignette */}
+    <section ref={sectionRef} id="signature" className="relative bg-background">
+      <div data-stage className="relative isolate h-screen w-full overflow-hidden flex items-center justify-center bg-background">
+        <SectionAmbient variant="signature" />
+        {/* soft warm vignette grounding the product on the light stage */}
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(circle at 50% 50%, rgba(200,16,46,0.14), rgba(0,0,0,0) 55%)' }} />
+          style={{ background: 'radial-gradient(circle at 50% 50%, rgba(255,76,0,0.08), rgba(249,249,249,0) 58%)' }} />
+
+        {/* scroll-reactive atmospheric glow */}
+        <div data-glow className="absolute rounded-full pointer-events-none will-change-transform"
+          style={{
+            width: 'min(92vw, 760px)', height: 'min(92vw, 760px)',
+            background: 'radial-gradient(circle, rgba(255,76,0,0.20) 0%, rgba(229,101,101,0.10) 40%, rgba(249,249,249,0) 66%)',
+          }} />
+
+        {/* slow turning rim-light — a halo of warmth orbiting behind the product */}
+        <div className="absolute rounded-full pointer-events-none animate-halo"
+          style={{
+            width: 'min(96vw, 820px)', height: 'min(96vw, 820px)',
+            background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,76,0,0.18) 40deg, transparent 90deg, transparent 200deg, rgba(229,101,101,0.14) 250deg, transparent 300deg)',
+            filter: 'blur(40px)',
+          }} />
+
+        {/* moving studio light — a soft warm band pans across the stage,
+            reading as a light being walked over a premium product shot */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-20 mix-blend-multiply">
+          <div className="absolute top-0 left-0 h-full w-[34%] animate-light-sweep"
+            style={{ background: 'linear-gradient(105deg, transparent 0%, rgba(255,76,0,0.05) 45%, rgba(255,76,0,0.09) 50%, rgba(255,76,0,0.05) 55%, transparent 100%)', filter: 'blur(16px)' }} />
+        </div>
 
         {/* rotating plate halo */}
         <div data-plate className="absolute rounded-full will-change-transform"
           style={{
             width: 'min(86vw, 720px)', height: 'min(86vw, 720px)',
-            background: 'conic-gradient(from 0deg, rgba(200,16,46,0.0), rgba(200,16,46,0.16), rgba(200,16,46,0.0), rgba(226,55,68,0.14), rgba(200,16,46,0.0))',
+            background: 'conic-gradient(from 0deg, rgba(255,76,0,0.0), rgba(255,76,0,0.18), rgba(255,76,0,0.0), rgba(229,101,101,0.16), rgba(255,76,0,0.0))',
             maskImage: 'radial-gradient(circle, transparent 38%, black 40%, black 70%, transparent 72%)',
             WebkitMaskImage: 'radial-gradient(circle, transparent 38%, black 40%, black 70%, transparent 72%)',
           }} />
 
         {/* pizza + separable toppings */}
-        <div className="relative flex items-center justify-center" style={{ width: 'min(82vw, 560px)', height: 'min(82vw, 560px)' }}>
+        <div className="relative flex items-center justify-center" style={{ width: 'min(82vw, 560px)', height: 'min(82vw, 560px)', perspective: '1100px', transformStyle: 'preserve-3d' }}>
           <img
             data-pizza
             src={signaturePizza}
@@ -144,14 +175,14 @@ export default function SignatureExperience() {
         </div>
 
         <div data-title className="absolute left-0 right-0 bottom-[12vh] text-center px-6 z-30 pointer-events-none">
-          <h2 className="font-cormorant font-light text-white leading-[0.95]" style={{ fontSize: 'clamp(2.6rem,8vw,6.5rem)' }}>
-            Signature <em className="italic text-primary">Recipes</em>
+          <h2 className="font-cormorant font-semibold text-ink leading-[0.95] tracking-tight" style={{ fontSize: 'clamp(2.6rem,8vw,6.5rem)' }}>
+            Signature <em className="italic font-light text-primary">Recipes</em>
           </h2>
         </div>
 
         <div data-sub className="absolute left-0 right-0 bottom-[14vh] text-center px-6 z-30 pointer-events-none">
-          <p className="font-cormorant text-white/70 mx-auto max-w-xl" style={{ fontSize: 'clamp(1.3rem,3vw,2.2rem)', fontWeight: 300 }}>
-            Built layer by layer with<br /><em className="italic text-primary">premium ingredients.</em>
+          <p className="text-ink/65 mx-auto max-w-xl" style={{ fontSize: 'clamp(1.3rem,3vw,2.2rem)', fontWeight: 300 }}>
+            Built layer by layer with <em className="italic text-primary">premium ingredients.</em>
           </p>
         </div>
 
@@ -159,10 +190,10 @@ export default function SignatureExperience() {
           <a
             href="#menu"
             onClick={(e) => { e.preventDefault(); document.querySelector('#menu')?.scrollIntoView({ behavior: 'smooth' }) }}
-            className="inline-flex items-center gap-4 px-10 py-4 border border-white/20 font-josefin text-[10px] tracking-[0.4em] uppercase text-white/80 hover:text-white hover:border-primary hover:bg-primary/10 transition-all duration-500 pointer-events-auto"
+            className="btn-depth btn-primary inline-flex items-center gap-4 px-10 py-4 font-josefin text-[10px] tracking-[0.4em] uppercase pointer-events-auto"
           >
             Explore the Menu
-            <span className="w-5 h-px bg-white/40" />
+            <span className="w-5 h-px bg-white/60" />
           </a>
         </div>
       </div>

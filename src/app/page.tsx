@@ -1,5 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
+import Atmosphere from '@/components/Atmosphere'
 import AboutExperience from '@/components/AboutExperience'
 import IngredientShowcase from '@/components/IngredientShowcase'
 import MenuExperience from '@/components/MenuExperience'
@@ -10,8 +11,11 @@ import Footer from '@/components/Footer'
 
 export default function Page() {
   return (
-    <main className="bg-black text-white overflow-x-clip">
+    <main className="bg-background text-ink overflow-x-clip">
       <Navbar />
+      {/* Page-wide living ember field — the connective tissue that makes every
+          section feel like one continuous, breathing environment */}
+      <Atmosphere />
       {/* Hero — preserved exactly (240-frame cinematic canvas) */}
       <Hero />
       {/* Our Story */}

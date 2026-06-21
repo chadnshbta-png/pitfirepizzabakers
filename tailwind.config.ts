@@ -9,15 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Official Pizza Hut red — used as an accent, not everywhere.
-        primary: '#C8102E',
-        primaryDark: '#8A0A20',
-        ember: '#E23744',
-        background: '#000000',
+        // Brand palette (Branding.json): vivid orange accent + coral secondary.
+        primary: '#FF4C00',
+        primaryDark: '#D63F00',
+        secondary: '#E56565',
+        ember: '#FF6A33',      // warm orange tint used for glows/gradients
+        ink: '#262626',        // textPrimary
+        surface: '#FFFFFF',
+        background: '#F9F9F9',
       },
       fontFamily: {
-        cormorant: ['var(--font-cormorant)', 'Georgia', 'serif'],
-        josefin: ['var(--font-josefin)', 'sans-serif'],
+        // Brand is a single grotesque family; legacy names re-point to it so
+        // existing font-cormorant / font-josefin utilities all resolve to Suisse-like Hanken.
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        cormorant: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        josefin: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         scrollLine: {

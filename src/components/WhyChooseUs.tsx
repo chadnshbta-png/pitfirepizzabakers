@@ -1,9 +1,14 @@
 'use client'
 
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { useRef, useEffect } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { prefersReducedMotion, useTilt, useSceneParallax } from '@/lib/motion'
+import SectionAmbient from './SectionAmbient'
 
-type Card = { num: string; title: string; line: string; icon: React.JSX.Element }
+gsap.registerPlugin(ScrollTrigger)
+
+type Card = { num: string; title: string; line: string; icon: React.JSX.Element; parY: number; offset: string }
 
 const stroke = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.4, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
 
@@ -12,6 +17,8 @@ const CARDS: Card[] = [
     num: '01',
     title: 'Fresh Daily',
     line: 'Dough proofed and stretched by hand every single morning.',
+    parY: 78,
+    offset: 'md:mt-0',
     icon: (
       <svg viewBox="0 0 48 48" className="w-9 h-9" {...stroke}>
         <path d="M24 6c3 6-2 8-2 12a6 6 0 0012 0c0-2-1-4-2-5 4 2 8 7 8 14a16 16 0 01-32 0c0-9 8-13 16-21z" />
@@ -22,6 +29,8 @@ const CARDS: Card[] = [
     num: '02',
     title: 'Fast Delivery',
     line: 'Hot, boxed and at your door before the cheese settles.',
+    parY: 30,
+    offset: 'md:mt-28',
     icon: (
       <svg viewBox="0 0 48 48" className="w-9 h-9" {...stroke}>
         <circle cx="14" cy="34" r="5" />
@@ -35,6 +44,8 @@ const CARDS: Card[] = [
     num: '03',
     title: 'Premium Ingredients',
     line: 'Real cheese, vine tomatoes and toppings worth the wait.',
+    parY: 56,
+    offset: 'md:mt-14',
     icon: (
       <svg viewBox="0 0 48 48" className="w-9 h-9" {...stroke}>
         <path d="M24 8C16 8 8 14 8 22c0 10 10 18 16 18s16-8 16-18c0-8-8-14-16-14z" />
@@ -47,58 +58,120 @@ const CARDS: Card[] = [
   },
 ]
 
-export default function WhyChooseUs() {
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-15%' })
+function WhyCard({ card }: { card: Card }) {
+  const tiltRef = useRef<HTMLDivElement>(null)
+  useTilt(tiltRef, { max: 9, scale: 1.04, lift: 12, perspective: 1200 })
 
   return (
-    <section className="relative bg-black py-[16vh] overflow-hidden">
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[420px] bg-primary/[0.05] rounded-full blur-[170px] pointer-events-none" />
+    // Three independent transform layers so nothing fights for a channel:
+    //   outer  → continuous scroll-camera depth (useSceneParallax)
+    //   middle → one-shot entrance (gsap.from on [data-card])
+    //   inner  → cursor tilt (useTilt)
+    <div
+      data-par data-par-y={card.parY} data-z="70" data-rot="6"
+      className={`relative ${card.offset} will-change-transform`}
+      style={{ transformStyle: 'preserve-3d' }}
+    >
+      {/* oversized ghost numeral floating behind the card on a deeper plane */}
+      <span
+        data-par data-par-y="-46"
+        className="pointer-events-none absolute -top-[12%] -left-[6%] font-cormorant font-bold leading-none select-none -z-10 tracking-tighter"
+        style={{ fontSize: 'clamp(7rem,12vw,12rem)', color: 'rgba(38,38,38,0.05)' }}
+      >
+        {card.num}
+      </span>
 
-      <div ref={ref} className="max-w-screen-xl mx-auto px-6 md:px-10">
-        {/* header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-20 md:mb-28"
+      <div data-card className="will-change-transform" style={{ transformStyle: 'preserve-3d' }}>
+        {/* the card body — owns its own cursor tilt (separate transform channels) */}
+        <div
+          ref={tiltRef}
+          className="card-surface rounded-[14px] p-9 md:p-11 relative overflow-hidden group will-change-transform"
         >
-          <span className="font-josefin text-[10px] tracking-[0.5em] uppercase text-primary">Why Pizza Hut</span>
-          <h2 className="font-cormorant font-light text-white leading-[0.98] mt-4" style={{ fontSize: 'clamp(2.4rem,6vw,5rem)' }}>
-            Made the <em className="italic text-primary">Right</em> Way
+          {/* top accent line grows on hover */}
+          <span className="absolute top-0 left-0 h-px bg-primary w-0 group-hover:w-full transition-all duration-700" />
+          {/* corner number */}
+          <span className="absolute top-6 right-7 font-cormorant font-bold text-ink/[0.08] leading-none tracking-tighter" style={{ fontSize: 'clamp(2.4rem,4vw,3.4rem)' }}>
+            {card.num}
+          </span>
+
+          <div className="text-primary mb-8">{card.icon}</div>
+          <h3 className="font-cormorant font-semibold text-ink mb-4 tracking-tight" style={{ fontSize: 'clamp(1.8rem,3vw,2.6rem)' }}>
+            {card.title}
+          </h3>
+          <p className="text-ink/55 leading-[1.7]" style={{ fontSize: 'clamp(1rem,1.4vw,1.15rem)' }}>
+            {card.line}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function WhyChooseUs() {
+  const sectionRef = useRef<HTMLDivElement>(null)
+
+  useSceneParallax(sectionRef)
+
+  useEffect(() => {
+    const root = sectionRef.current
+    if (!root) return
+    const reduce = prefersReducedMotion()
+
+    const ctx = gsap.context(() => {
+      if (reduce) {
+        gsap.set('[data-card], [data-fade-up]', { opacity: 1, y: 0, z: 0, rotateX: 0 })
+        return
+      }
+
+      gsap.from('[data-fade-up]', {
+        opacity: 0, yPercent: 30, filter: 'blur(10px)',
+        duration: 1.1, ease: 'power3.out', stagger: 0.1,
+        scrollTrigger: { trigger: root, start: 'top 78%', once: true },
+      })
+
+      // cards arrive from different depths and directions — alternating sweep
+      // rather than three identical rises, so it doesn't read as one block
+      gsap.utils.toArray<HTMLElement>('[data-card]').forEach((card, i) => {
+        const dir = i === 1 ? 0 : i === 0 ? -1 : 1
+        gsap.from(card, {
+          opacity: 0, y: 90, x: dir * 60, z: -340, rotateX: 16, rotateY: dir * -10,
+          duration: 1.3, ease: 'power3.out',
+          scrollTrigger: { trigger: root, start: 'top 66%', once: true },
+          delay: i * 0.12,
+        })
+      })
+    }, root)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <section ref={sectionRef} className="relative isolate bg-background py-[18vh] overflow-clip">
+      <SectionAmbient variant="why" />
+      <div className="seam-top" />
+
+      {/* ambient pools on the slowest plane — driven by the scroll-camera */}
+      <div data-par data-par-y="-60" className="absolute left-[8%] top-[18%] w-[44vw] h-[44vw] max-w-[620px] max-h-[620px] bg-primary/[0.05] rounded-full blur-[170px] pointer-events-none" />
+      <div data-par data-par-y="-44" className="absolute right-[6%] bottom-[10%] w-[40vw] h-[40vw] max-w-[560px] max-h-[560px] bg-ember/[0.04] rounded-full blur-[180px] pointer-events-none" />
+
+      <div className="max-w-screen-xl mx-auto px-6 md:px-10 relative">
+        {/* header */}
+        <div className="text-center mb-24 md:mb-32">
+          <span data-fade-up className="block font-josefin text-[10px] tracking-[0.5em] uppercase text-primary">Why Pizza Hut</span>
+          <h2 data-fade-up className="font-cormorant font-semibold text-ink leading-[0.98] mt-4 tracking-tight" style={{ fontSize: 'clamp(2.4rem,6vw,5rem)' }}>
+            Made the <em className="italic font-light text-primary">Right</em> Way
           </h2>
-        </motion.div>
+        </div>
 
-        {/* cards — emerge from Z depth */}
-        <div className="grid md:grid-cols-3 gap-6 md:gap-8" style={{ perspective: '1600px' }}>
-          {CARDS.map((c, i) => (
-            <motion.div
-              key={c.num}
-              initial={{ opacity: 0, z: -260, rotateX: 12, y: 56 }}
-              animate={inView ? { opacity: 1, z: 0, rotateX: 0, y: 0 } : {}}
-              transition={{ duration: 0.9, delay: i * 0.14, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -8, transition: { duration: 0.4 } }}
-              className="glass-strong rounded-3xl p-9 md:p-11 relative overflow-hidden group preserve-3d"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              {/* corner number */}
-              <span className="absolute top-6 right-7 font-cormorant font-light text-white/10 leading-none" style={{ fontSize: 'clamp(3rem,5vw,4.5rem)' }}>
-                {c.num}
-              </span>
-              {/* top accent line grows on hover */}
-              <span className="absolute top-0 left-0 h-px bg-primary w-0 group-hover:w-full transition-all duration-700" />
-
-              <div className="text-primary mb-8">{c.icon}</div>
-              <h3 className="font-cormorant font-light text-white mb-4" style={{ fontSize: 'clamp(1.8rem,3vw,2.6rem)' }}>
-                {c.title}
-              </h3>
-              <p className="font-cormorant text-white/50 leading-[1.7]" style={{ fontSize: 'clamp(1rem,1.4vw,1.15rem)', fontWeight: 300 }}>
-                {c.line}
-              </p>
-            </motion.div>
+        {/* staggered Z-plane panels */}
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8 items-start" style={{ perspective: '1700px', transformStyle: 'preserve-3d' }}>
+          {CARDS.map((c) => (
+            <WhyCard key={c.num} card={c} />
           ))}
         </div>
       </div>
+
+      <div className="seam-bottom" />
     </section>
   )
 }
