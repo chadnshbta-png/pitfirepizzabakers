@@ -9,6 +9,11 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
+    // Mobile browsers fire resize on every URL-bar show/hide; without this each
+    // would trigger a full (expensive) ScrollTrigger.refresh mid-scroll, causing
+    // jank. The real layout doesn't change, so ignore those height-only events.
+    ScrollTrigger.config({ ignoreMobileResize: true })
+
     const lenis = new Lenis({
       duration: 1.4,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

@@ -126,9 +126,23 @@ export function useSceneParallax(
       }
     }
 
-    gsap.ticker.add(update)
-    update()
-    return () => gsap.ticker.remove(update)
+    // Only run the per-frame loop while the section is on (or near) screen. When
+    // it scrolls away we remove the ticker entirely — no idle getBoundingClientRect
+    // work, no layout reads, when nothing it touches is even visible.
+    let active = false
+    const start = () => { if (!active) { active = true; gsap.ticker.add(update) } }
+    const stop = () => { if (active) { active = false; gsap.ticker.remove(update) } }
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { start(); update() } else stop() },
+      { rootMargin: '20% 0px 20% 0px' }
+    )
+    io.observe(root)
+    update() // position once on mount
+
+    return () => {
+      io.disconnect()
+      stop()
+    }
   }, [ref, selector, mobileAmp])
 }
 

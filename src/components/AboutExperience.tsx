@@ -59,7 +59,16 @@ export default function AboutExperience() {
     const root = sectionRef.current
     if (!root) return
     const mq = window.matchMedia('(min-width: 768px)')
-    if (!mq.matches || prefersReducedMotion()) return
+    if (!mq.matches) return
+    // Reduced motion: skip the pinned scrub. Hide the intro overlay (so it can't
+    // sit over the chapters) and reveal a single readable chapter at rest.
+    if (prefersReducedMotion()) {
+      const introEl = root.querySelector('[data-intro]') as HTMLElement | null
+      if (introEl) gsap.set(introEl, { autoAlpha: 0 })
+      const chaptersR = gsap.utils.toArray<HTMLElement>('[data-chapter]', root)
+      chaptersR.forEach((c, i) => gsap.set(c, { autoAlpha: i === 0 ? 1 : 0 }))
+      return
+    }
 
     const ctx = gsap.context(() => {
       const stage = root.querySelector('[data-stage]') as HTMLElement
@@ -71,19 +80,58 @@ export default function AboutExperience() {
         year: c.querySelector('[data-c-year]') as HTMLElement,
         text: c.querySelector('[data-c-text]') as HTMLElement,
       }))
-      const ticks = ticksRef.current ? Array.from(ticksRef.current.children) as HTMLElement[] : []
+      // cache hot-loop lookups once (no querySelector inside the scrub handler)
+      const ticks = ticksRef.current
+        ? (Array.from(ticksRef.current.children) as HTMLElement[]).map((tk) => ({
+            fill: tk.querySelector('[data-tick-fill]') as HTMLElement,
+            label: tk.querySelector('[data-tick-label]') as HTMLElement,
+          }))
+        : []
+      const chromeEls = Array.from(root.querySelectorAll<HTMLElement>('[data-chrome]'))
 
-      // Each chapter is a full-stage layer; `d` is its signed distance from the
-      // "playhead". d=0 → centred & sharp; |d|→1 → receded, lifted and faded.
-      // Inner layers (image / year / text) move at different rates for depth.
+      // intro-sequence layers
+      const intro = root.querySelector('[data-intro]') as HTMLElement | null
+      const introEls = {
+        eyebrow: root.querySelector('[data-intro-eyebrow]') as HTMLElement | null,
+        l1: root.querySelector('[data-intro-l1]') as HTMLElement | null,
+        l2: root.querySelector('[data-intro-l2]') as HTMLElement | null,
+        copy: root.querySelector('[data-intro-copy]') as HTMLElement | null,
+      }
+
+      // smoothstep — eased 0→1 ramp between two thresholds
+      const smooth = (x: number, a: number, b: number) => {
+        const t = clamp((x - a) / (b - a), 0, 1)
+        return t * t * (3 - 2 * t)
+      }
+
+      // The pinned scroll is split into an INTRO act and a CHAPTERS act. The
+      // intro reveals (eyebrow → title lines → copy), holds, then the whole
+      // group recedes into depth as the chapters cross-fade in — a documentary
+      // chapter-card handoff. INTRO is the fraction of total scroll it owns.
+      const chapScroll = (n - 1) * 88
+      const INTRO = 0.26
+      const total = Math.round(chapScroll / (1 - INTRO))
+
       const apply = (p: number) => {
-        const pos = p * (n - 1)
+        // ── INTRO ACT ──────────────────────────────────────────────────
+        const ip = clamp(p / INTRO, 0, 1)
+        const recede = smooth(ip, 0.62, 1)              // recedes over the tail
+        if (intro) gsap.set(intro, { z: -recede * 380, scale: 1 - recede * 0.18, yPercent: -recede * 7, autoAlpha: 1 - recede, force3D: true })
+        if (introEls.eyebrow) gsap.set(introEls.eyebrow, { autoAlpha: smooth(ip, 0, 0.07), y: (1 - smooth(ip, 0, 0.07)) * 18, force3D: true })
+        if (introEls.l1) gsap.set(introEls.l1, { autoAlpha: smooth(ip, 0.05, 0.22), yPercent: (1 - smooth(ip, 0.05, 0.22)) * 105, force3D: true })
+        if (introEls.l2) gsap.set(introEls.l2, { autoAlpha: smooth(ip, 0.12, 0.30), yPercent: (1 - smooth(ip, 0.12, 0.30)) * 105, force3D: true })
+        if (introEls.copy) gsap.set(introEls.copy, { autoAlpha: smooth(ip, 0.24, 0.44), y: (1 - smooth(ip, 0.24, 0.44)) * 22, force3D: true })
+
+        // ── CHAPTERS ACT ───────────────────────────────────────────────
+        const cp = clamp((p - INTRO) / (1 - INTRO), 0, 1)
+        const chGate = smooth(p, INTRO * 0.72, INTRO) // chapters fade in as intro leaves
+        const pos = cp * (n - 1)
         for (let i = 0; i < n; i++) {
           const d = i - pos
           const ad = clamp(Math.abs(d), 0, 1.25)
           const part = parts[i]
           gsap.set(part.root, {
-            autoAlpha: clamp(1 - ad * 1.05, 0, 1),
+            autoAlpha: clamp(1 - ad * 1.05, 0, 1) * chGate,
             zIndex: 10 - Math.round(ad * 10),
             force3D: true,
           })
@@ -100,10 +148,12 @@ export default function AboutExperience() {
         const active = Math.round(pos)
         ticks.forEach((tk, i) => {
           const on = i === active
-          gsap.set(tk.querySelector('[data-tick-fill]'), { scaleX: i <= pos ? 1 : clamp(pos - i + 1, 0, 1) })
-          gsap.set(tk.querySelector('[data-tick-label]'), { color: on ? '#FF4C00' : 'rgba(38,38,38,0.4)', fontWeight: on ? 600 : 400 })
+          if (tk.fill) gsap.set(tk.fill, { scaleX: i <= pos ? 1 : clamp(pos - i + 1, 0, 1) })
+          if (tk.label) gsap.set(tk.label, { color: on ? '#FF4C00' : 'rgba(38,38,38,0.4)', fontWeight: on ? 600 : 400 })
         })
-        if (progressRef.current) progressRef.current.style.transform = `scaleX(${p})`
+        // chrome (ticks + progress) belongs to the chapters act only
+        for (const el of chromeEls) gsap.set(el, { autoAlpha: chGate })
+        if (progressRef.current) progressRef.current.style.transform = `scaleX(${cp})`
       }
 
       gsap.to({}, {
@@ -111,7 +161,7 @@ export default function AboutExperience() {
         scrollTrigger: {
           trigger: root,
           start: 'top top',
-          end: () => '+=' + (n - 1) * 88 + '%',
+          end: () => '+=' + total + '%',
           pin: stage,
           scrub: 1,
           anticipatePin: 1,
@@ -157,56 +207,80 @@ export default function AboutExperience() {
         <div className="absolute -left-[10%] top-[12%] w-[46vw] h-[46vw] max-w-[640px] max-h-[640px] rounded-full bg-primary/[0.06] blur-[150px] pointer-events-none" />
         <div className="absolute -right-[12%] bottom-[8%] w-[42vw] h-[42vw] max-w-[560px] max-h-[560px] rounded-full bg-secondary/[0.07] blur-[160px] pointer-events-none" />
 
-        {/* fixed section label */}
-        <div className="absolute top-[11vh] left-10 lg:left-16 z-30 pointer-events-none">
-          <span className="font-josefin text-[10px] tracking-[0.5em] uppercase text-primary">Our Story</span>
-          <h2 className="font-cormorant font-semibold text-ink leading-[0.95] mt-2 tracking-tight" style={{ fontSize: 'clamp(1.6rem,2.6vw,2.6rem)' }}>
-            Sixty-Five Years <em className="italic font-light text-primary">in the Making</em>
+        {/* ── INTRO SEQUENCE — a documentary chapter card that reveals, holds,
+            then recedes into depth before the story chapters take over. Its own
+            layer (z-40), so it never collides with the chapter content. ── */}
+        <div data-intro className="absolute inset-0 z-40 flex flex-col items-center justify-center text-center px-6 pointer-events-none will-change-transform" style={{ transformStyle: 'preserve-3d' }}>
+          <span data-intro-eyebrow className="block font-josefin text-[11px] tracking-[0.6em] uppercase text-primary mb-7 will-change-transform">
+            Our Story
+          </span>
+          <h2 className="font-cormorant font-semibold text-ink leading-[0.92] tracking-tight overflow-hidden" style={{ fontSize: 'clamp(2.6rem,7vw,6rem)' }}>
+            <span className="block overflow-hidden">
+              <span data-intro-l1 className="block will-change-transform">Sixty-Five Years</span>
+            </span>
+            <span className="block overflow-hidden">
+              <span data-intro-l2 className="block italic font-light text-primary will-change-transform">in the Making</span>
+            </span>
           </h2>
+          <p data-intro-copy className="italic text-ink/55 mt-8 max-w-xl leading-relaxed will-change-transform" style={{ fontSize: 'clamp(1.05rem,1.5vw,1.3rem)' }}>
+            From a single oven in Wichita to tables around the world — sixty-five years of one promise: take care of the customer.
+          </p>
         </div>
 
-        {/* chapter layers — stacked, cross-dissolved by scroll */}
+        {/* chapter layers — stacked, cross-dissolved by scroll.
+            Editorial magazine spread: text owns the LEFT column, imagery owns
+            the RIGHT column, with a clear empty gutter between them. The giant
+            year numeral lives entirely inside the image column as a faint
+            typographic backdrop — it never crosses into the reading column. */}
         {CHAPTERS.map((c) => (
           <div data-chapter key={c.year} className="absolute inset-0 flex items-center will-change-transform" style={{ transformStyle: 'preserve-3d' }}>
-            <div className="relative w-full max-w-screen-2xl mx-auto px-12 lg:px-20 grid grid-cols-12 items-center gap-8">
-              {/* giant year numeral — typographic spine behind the image */}
-              <div data-c-year className="pointer-events-none absolute -top-[6vh] left-8 lg:left-16 z-0 will-change-transform">
-                <span className="font-cormorant font-bold leading-none select-none tracking-tighter"
-                  style={{ fontSize: 'clamp(12rem,26vw,26rem)', color: 'rgba(38,38,38,0.05)' }}>
-                  {c.year}
+            <div className="relative w-full max-w-screen-2xl mx-auto px-12 lg:px-20 grid grid-cols-12 items-center gap-x-10 lg:gap-x-20">
+              {/* text — dedicated left column (cols 1–5) */}
+              <div data-c-text className="col-start-1 col-span-12 md:col-span-5 relative z-20 will-change-transform">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="block w-10 h-px bg-primary" />
+                  <span className="font-josefin text-[11px] tracking-[0.45em] uppercase text-primary">{c.kicker}</span>
+                </div>
+                <h3 className="font-cormorant font-semibold text-ink leading-[1.04] mb-7 tracking-tight" style={{ fontSize: 'clamp(2.1rem,3.6vw,3.5rem)' }}>
+                  {c.title}
+                </h3>
+                <p className="text-ink/60 leading-[1.9] max-w-md" style={{ fontSize: 'clamp(1rem,1.15vw,1.16rem)' }}>
+                  {c.body}
+                </p>
+                <span className="mt-8 hidden md:inline-flex items-center gap-3 font-josefin text-[10px] tracking-[0.4em] uppercase text-ink/35">
+                  <span className="block w-6 h-px bg-ink/25" />
+                  Est. {c.year}
                 </span>
               </div>
 
-              {/* image */}
-              <div className="col-span-6 relative z-10" style={{ perspective: '1400px' }}>
-                <div data-c-img className="relative will-change-transform" style={{ transformStyle: 'preserve-3d' }}>
+              {/* spacer gutter (col 6) is intentionally empty for breathing room */}
+
+              {/* imagery — dedicated right column (cols 7–12) */}
+              <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 relative z-10 mt-10 md:mt-0" style={{ perspective: '1400px' }}>
+                {/* giant year numeral — backdrop confined to the image column */}
+                <div data-c-year className="pointer-events-none absolute -top-[12vh] right-[-2vw] z-0 will-change-transform">
+                  <span className="font-cormorant font-bold leading-none select-none tracking-tighter"
+                    style={{ fontSize: 'clamp(8rem,14vw,17rem)', color: 'rgba(38,38,38,0.045)' }}>
+                    {c.year}
+                  </span>
+                </div>
+
+                <div data-c-img className="relative z-10 will-change-transform" style={{ transformStyle: 'preserve-3d' }}>
+                  {/* offset matte — a quiet gallery frame behind the plate */}
+                  <div className="absolute -inset-3 rounded-[18px] border border-ink/10 pointer-events-none" />
                   <div className="relative rounded-[14px] overflow-hidden card-surface"
-                    style={{ aspectRatio: '4 / 5', boxShadow: '0 50px 90px rgba(38,38,38,0.18)' }}>
+                    style={{ aspectRatio: '5 / 6', boxShadow: '0 50px 90px rgba(38,38,38,0.18)' }}>
                     <img src={c.image} alt={c.title} className="absolute inset-0 w-full h-full object-cover animate-breathe" />
                     <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(38,38,38,0.28), transparent 50%)' }} />
                   </div>
                 </div>
-              </div>
-
-              {/* text */}
-              <div data-c-text className="col-span-6 relative z-20 will-change-transform">
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="block w-9 h-px bg-primary" />
-                  <span className="font-josefin text-[11px] tracking-[0.45em] uppercase text-primary">{c.kicker} · {c.year}</span>
-                </div>
-                <h3 className="font-cormorant font-semibold text-ink leading-[1.02] mb-6 tracking-tight" style={{ fontSize: 'clamp(2.4rem,4.4vw,3.8rem)' }}>
-                  {c.title}
-                </h3>
-                <p className="text-ink/60 leading-[1.8] max-w-lg" style={{ fontSize: 'clamp(1.02rem,1.3vw,1.2rem)' }}>
-                  {c.body}
-                </p>
               </div>
             </div>
           </div>
         ))}
 
         {/* timeline ticks */}
-        <div ref={ticksRef} className="absolute bottom-[7vh] left-10 lg:left-16 right-10 lg:right-16 z-30 flex gap-3">
+        <div ref={ticksRef} data-chrome className="absolute bottom-[7vh] left-10 lg:left-16 right-10 lg:right-16 z-30 flex gap-3">
           {CHAPTERS.map((c) => (
             <div key={c.year} className="flex-1">
               <div className="relative h-px bg-ink/12 overflow-hidden">
@@ -220,7 +294,7 @@ export default function AboutExperience() {
         </div>
 
         {/* global scrub progress */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-ink/10 z-30">
+        <div data-chrome className="absolute bottom-0 left-0 right-0 h-px bg-ink/10 z-30">
           <div ref={progressRef} className="h-full bg-primary origin-left" style={{ transform: 'scaleX(0)' }} />
         </div>
       </div>

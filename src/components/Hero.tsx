@@ -53,12 +53,21 @@ export default function Hero() {
     canvas.width  = window.innerWidth
     canvas.height = window.innerHeight
 
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { alpha: false })
     if (!ctx) return
 
+    // Skip redundant paints: the scrub fires many sub-pixel updates that round
+    // to the SAME frame index (≈25px of scroll per frame). Re-drawing the same
+    // image is wasted clearRect + drawImage every tick — track the last frame
+    // actually painted and bail when it hasn't changed. `draw(-1)` invalidation
+    // (used on resize) forces the next paint regardless.
+    let lastFrame = -1
     function draw(i: number) {
-      const img = images[Math.max(0, Math.min(totalFrames - 1, Math.round(i)))]
+      const idx = Math.max(0, Math.min(totalFrames - 1, Math.round(i)))
+      if (idx === lastFrame) return
+      const img = images[idx]
       if (!img?.complete || !img.naturalWidth) return
+      lastFrame = idx
       const cw = canvas.width, ch = canvas.height
       ctx!.clearRect(0, 0, cw, ch)
       // Landscape viewports (desktop / tablet-landscape) — unchanged stretch-fill.
@@ -104,15 +113,26 @@ export default function Hero() {
       onUpdate() { draw(frameObj.frame) },
     })
 
+    // Debounced + guarded: only reallocate the (expensive) canvas backing store
+    // when the viewport actually changed size, and coalesce resize bursts to one
+    // rAF so dragging the window edge doesn't thrash.
+    let resizeRaf = 0
     const onResize = () => {
-      canvas.width  = window.innerWidth
-      canvas.height = window.innerHeight
-      draw(frameObj.frame)
+      cancelAnimationFrame(resizeRaf)
+      resizeRaf = requestAnimationFrame(() => {
+        const w = window.innerWidth, h = window.innerHeight
+        if (w === canvas.width && h === canvas.height) return
+        canvas.width = w
+        canvas.height = h
+        lastFrame = -1               // force a repaint at the new size
+        draw(frameObj.frame)
+      })
     }
     window.addEventListener('resize', onResize)
 
     return () => {
       tl.kill()   // also kills the embedded ScrollTrigger
+      cancelAnimationFrame(resizeRaf)
       window.removeEventListener('resize', onResize)
     }
   }, [loaded])

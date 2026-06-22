@@ -89,12 +89,6 @@ export default function Navbar() {
               className="h-7 md:h-9 w-auto transition-transform duration-500 group-hover:scale-[1.05]"
               priority
             />
-            <span className="hidden lg:flex items-center gap-3.5">
-              <span className={`block w-px h-7 transition-colors duration-500 ${lightText ? 'bg-white/25' : 'bg-ink/15'}`} />
-              <span className={`font-josefin text-[8px] leading-[1.5] tracking-[0.42em] uppercase transition-colors duration-500 ${lightText ? 'text-white/55' : 'text-ink/45'}`}>
-                Crafted<br />Fresh
-              </span>
-            </span>
           </a>
 
           {/* Desktop links */}

@@ -119,26 +119,35 @@ export default function WhyChooseUs() {
 
     const ctx = gsap.context(() => {
       if (reduce) {
-        gsap.set('[data-card], [data-fade-up]', { opacity: 1, y: 0, z: 0, rotateX: 0 })
+        gsap.set('[data-card], [data-why-eyebrow], [data-why-title]', { autoAlpha: 1, y: 0, x: 0, z: 0, rotateX: 0, rotateY: 0, scale: 1, yPercent: 0 })
         return
       }
 
-      gsap.from('[data-fade-up]', {
-        opacity: 0, yPercent: 30, filter: 'blur(10px)',
-        duration: 1.1, ease: 'power3.out', stagger: 0.1,
-        scrollTrigger: { trigger: root, start: 'top 78%', once: true },
+      // One scrubbed timeline so the whole chapter is *driven by scroll progress*
+      // as the section rises into view — heading and cards emerge from depth in a
+      // cinematic stagger rather than firing once on a threshold.
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start: 'top 88%',
+          end: 'top 30%',
+          scrub: 1,
+        },
       })
 
-      // cards arrive from different depths and directions — alternating sweep
-      // rather than three identical rises, so it doesn't read as one block
+      // heading participates — rises out of depth with a slow scale (progressive
+      // emphasis), then its continuous data-par drift keeps it part of the scene
+      tl.fromTo('[data-why-eyebrow]', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.5 }, 0)
+        .fromTo('[data-why-title]', { autoAlpha: 0, yPercent: 70, scale: 0.88 }, { autoAlpha: 1, yPercent: 0, scale: 1, ease: 'power3.out', duration: 0.85 }, 0.04)
+
+      // cards emerge from different depths and directions — alternating sweep
+      // (not one block), each tied to its own slice of the scroll
       gsap.utils.toArray<HTMLElement>('[data-card]').forEach((card, i) => {
         const dir = i === 1 ? 0 : i === 0 ? -1 : 1
-        gsap.from(card, {
-          opacity: 0, y: 90, x: dir * 60, z: -340, rotateX: 16, rotateY: dir * -10,
-          duration: 1.3, ease: 'power3.out',
-          scrollTrigger: { trigger: root, start: 'top 66%', once: true },
-          delay: i * 0.12,
-        })
+        tl.fromTo(card,
+          { autoAlpha: 0, y: 110, x: dir * 64, z: -400, rotateX: 18, rotateY: dir * -12 },
+          { autoAlpha: 1, y: 0, x: 0, z: 0, rotateX: 0, rotateY: 0, ease: 'power3.out', duration: 0.95 },
+          0.22 + i * 0.16)
       })
     }, root)
 
@@ -155,10 +164,12 @@ export default function WhyChooseUs() {
       <div data-par data-par-y="-44" className="absolute right-[6%] bottom-[10%] w-[40vw] h-[40vw] max-w-[560px] max-h-[560px] bg-ember/[0.04] rounded-full blur-[180px] pointer-events-none" />
 
       <div className="max-w-screen-xl mx-auto px-6 md:px-10 relative">
-        {/* header */}
-        <div className="text-center mb-24 md:mb-32">
-          <span data-fade-up className="block font-josefin text-[10px] tracking-[0.5em] uppercase text-primary">Why Pizza Hut</span>
-          <h2 data-fade-up className="font-cormorant font-semibold text-ink leading-[0.98] mt-4 tracking-tight" style={{ fontSize: 'clamp(2.4rem,6vw,5rem)' }}>
+        {/* header — outer plane carries continuous scroll-camera depth (data-par
+            scale = biggest when centred → progressive emphasis); inner words
+            carry the scroll-driven entrance. Separate transform channels. */}
+        <div data-par data-par-y="26" data-scl="0.05" className="text-center mb-24 md:mb-32 will-change-transform" style={{ transformStyle: 'preserve-3d' }}>
+          <span data-why-eyebrow className="block font-josefin text-[10px] tracking-[0.5em] uppercase text-primary will-change-transform">Why Pizza Hut</span>
+          <h2 data-why-title className="font-cormorant font-semibold text-ink leading-[0.98] mt-4 tracking-tight will-change-transform" style={{ fontSize: 'clamp(2.4rem,6vw,5rem)' }}>
             Made the <em className="italic font-light text-primary">Right</em> Way
           </h2>
         </div>

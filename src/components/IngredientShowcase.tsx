@@ -4,7 +4,7 @@ import { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Tomato, Cheese, Basil, Pepperoni } from './ingredients'
-import { prefersReducedMotion, useSceneParallax } from '@/lib/motion'
+import { prefersReducedMotion, useSceneParallax, usePointerParallax } from '@/lib/motion'
 import SectionAmbient from './SectionAmbient'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -33,10 +33,14 @@ function Station({ ing, index }: { ing: Ing; index: number }) {
       className={`relative min-h-[78vh] flex items-center ${left ? 'justify-start' : 'justify-end'} `}
       style={{ perspective: '1400px' }}
     >
-      {/* giant ghosted index — deep background plate, lags the scroll.
-          Centering lives on this flex wrapper (no transform) so the inner
-          span is free for the scroll-camera's transform channel. */}
-      <div className={`pointer-events-none absolute inset-y-0 flex items-center ${left ? 'right-[6%]' : 'left-[6%]'}`}>
+      {/* giant ghosted index — deep background plate, lags the scroll and
+          drifts least under the pointer (furthest from the lens). The pointer
+          channel lives on this no-transform flex wrapper; the inner span keeps
+          the scroll-camera channel — two separate elements, no conflict. */}
+      <div
+        data-pp data-depth="0.18"
+        className={`pointer-events-none absolute inset-y-0 flex items-center ${left ? 'right-[6%]' : 'left-[6%]'}`}
+      >
         <span
           data-par data-par-y="-40"
           className="font-cormorant font-bold leading-none select-none tracking-tighter"
@@ -46,8 +50,11 @@ function Station({ ing, index }: { ing: Ing; index: number }) {
         </span>
       </div>
 
-      {/* the floating ingredient cluster */}
+      {/* the floating ingredient cluster — drifts toward the pointer as a whole
+          plane (data-pp), while its body + label carry their own deeper
+          scroll-camera motion underneath */}
       <div
+        data-pp data-depth="0.55"
         className="relative flex items-center gap-8 md:gap-16 w-full max-w-2xl"
         style={{ transformStyle: 'preserve-3d', flexDirection: left ? 'row' : 'row-reverse' }}
       >
@@ -71,7 +78,7 @@ function Station({ ing, index }: { ing: Ing; index: number }) {
           {/* the ingredient — foreground body, pushes toward camera at centre,
               with its own ceaseless orbital drift */}
           <div
-            data-par data-par-y="55" data-z="220" data-rot="-10" data-scl="0.12"
+            data-par data-par-y="72" data-z="300" data-rot="-12" data-scl="0.14"
             className="absolute inset-0 flex items-center justify-center will-change-transform"
             style={{ transformStyle: 'preserve-3d' }}
           >
@@ -81,29 +88,36 @@ function Station({ ing, index }: { ing: Ing; index: number }) {
           </div>
         </div>
 
-        {/* floating label — parallaxes at its own rate, separate plane */}
+        {/* floating label — parallaxes at its own rate (scroll camera), with a
+            continuous idle bob on an inner plane so it never sits perfectly still */}
         <div data-par data-par-y="22" className="relative min-w-0 will-change-transform">
-          <span className="block font-josefin text-[10px] tracking-[0.5em] uppercase mb-3" style={{ color: `rgb(${ing.rgb})` }}>
-            {String(index + 1).padStart(2, '0')} — The Source
-          </span>
-          <h3 className="font-cormorant font-semibold text-ink leading-[0.95] tracking-tight" style={{ fontSize: 'clamp(2rem,4.2vw,3.6rem)' }}>
-            {ing.name}
-          </h3>
-          <div className="my-5 h-px w-12" style={{ background: `rgb(${ing.rgb})`, opacity: 0.7 }} />
-          <p className="italic text-ink/55 leading-relaxed max-w-xs" style={{ fontSize: 'clamp(1rem,1.5vw,1.25rem)' }}>
-            {ing.note}
-          </p>
+          <div className="animate-float-slow" style={{ animationDelay: `${index * 0.7}s`, animationDuration: `${9 + index}s` }}>
+            <span className="block font-josefin text-[10px] tracking-[0.5em] uppercase mb-3" style={{ color: `rgb(${ing.rgb})` }}>
+              {String(index + 1).padStart(2, '0')} — The Source
+            </span>
+            <h3 className="font-cormorant font-semibold text-ink leading-[0.95] tracking-tight" style={{ fontSize: 'clamp(2rem,4.2vw,3.6rem)' }}>
+              {ing.name}
+            </h3>
+            <div className="my-5 h-px w-12" style={{ background: `rgb(${ing.rgb})`, opacity: 0.7 }} />
+            <p className="italic text-ink/55 leading-relaxed max-w-xs" style={{ fontSize: 'clamp(1rem,1.5vw,1.25rem)' }}>
+              {ing.note}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* foreground fragments — small bodies that streak past nearest the camera */}
+      {/* foreground fragments — small bodies that streak past nearest the camera.
+          Three nested planes: scroll camera (data-par) → pointer drift (data-pp,
+          strongest because nearest the lens) → ceaseless orbit (CSS). */}
       <div
         data-par data-par-y="120" data-px={left ? '40' : '-40'}
         className="pointer-events-none absolute will-change-transform"
         style={{ top: '18%', [left ? 'right' : 'left']: '14%' } as React.CSSProperties}
       >
-        <div className="animate-orbit opacity-60" style={{ animationDelay: `${index}s` }}>
-          <ing.Comp size={44} />
+        <div data-pp data-depth="1.4">
+          <div className="animate-orbit opacity-60" style={{ animationDelay: `${index}s` }}>
+            <ing.Comp size={44} />
+          </div>
         </div>
       </div>
       <div
@@ -111,8 +125,22 @@ function Station({ ing, index }: { ing: Ing; index: number }) {
         className="pointer-events-none absolute will-change-transform"
         style={{ bottom: '20%', [left ? 'left' : 'right']: '20%' } as React.CSSProperties}
       >
-        <div className="animate-orbit opacity-40" style={{ animationDelay: `${index * 0.7 + 2}s`, animationDuration: '13s' }}>
-          <ing.Comp size={30} />
+        <div data-pp data-depth="1.7">
+          <div className="animate-orbit opacity-40" style={{ animationDelay: `${index * 0.7 + 2}s`, animationDuration: '13s' }}>
+            <ing.Comp size={30} />
+          </div>
+        </div>
+      </div>
+      {/* a third, deep fragment — drifts slow and faint far behind the cluster */}
+      <div
+        data-par data-par-y="-60"
+        className="pointer-events-none absolute will-change-transform hidden md:block"
+        style={{ top: '52%', [left ? 'right' : 'left']: '38%' } as React.CSSProperties}
+      >
+        <div data-pp data-depth="0.32">
+          <div className="animate-orbit opacity-[0.22]" style={{ animationDelay: `${index * 0.5 + 1}s`, animationDuration: '19s' }}>
+            <ing.Comp size={64} />
+          </div>
         </div>
       </div>
     </div>
@@ -124,6 +152,9 @@ export default function IngredientShowcase() {
 
   // continuous scroll-camera depth across every tagged layer
   useSceneParallax(sectionRef)
+  // cursor-reactive drift — a second, independent depth axis layered on top of
+  // the scroll camera so the suspended ingredients react to the pointer too
+  usePointerParallax(sectionRef, '[data-pp]', 52)
 
   useEffect(() => {
     const root = sectionRef.current

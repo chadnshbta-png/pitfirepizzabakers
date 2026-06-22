@@ -51,6 +51,22 @@ export default function Atmosphere() {
     let w = 0, h = 0
     let particles: P[] = []
 
+    // Pre-rendered glow sprites — one per tint. Stamping a cached sprite with a
+    // per-particle globalAlpha is dramatically cheaper than building a fresh
+    // radial gradient for every particle on every frame (heavy CPU + GC churn).
+    const SPRITE = 64
+    const sprites = TINTS.map(([r, g, b]) => {
+      const c = document.createElement('canvas')
+      c.width = c.height = SPRITE
+      const sctx = c.getContext('2d')!
+      const grd = sctx.createRadialGradient(SPRITE / 2, SPRITE / 2, 0, SPRITE / 2, SPRITE / 2, SPRITE / 2)
+      grd.addColorStop(0, `rgba(${r},${g},${b},1)`)
+      grd.addColorStop(1, `rgba(${r},${g},${b},0)`)
+      sctx.fillStyle = grd
+      sctx.fillRect(0, 0, SPRITE, SPRITE)
+      return c
+    })
+
     // The Hero is a pure cinematic visual — the ambient field must never appear
     // over it. We fade the canvas out (and skip its draw loop) whenever the Hero
     // owns the viewport, then fade back in for the light content scenes below.
@@ -136,16 +152,13 @@ export default function Atmosphere() {
         const twinkle = 0.5 + 0.5 * Math.sin(t * 1.6 + p.tw)
         // tuned for a near-white canvas: warm motes read as soft floating dust
         const a = (0.05 + p.z * 0.13) * (0.55 + twinkle * 0.45)
-        const [rr, gg, bb] = TINTS[p.hue]
 
-        const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4)
-        grd.addColorStop(0, `rgba(${rr},${gg},${bb},${a})`)
-        grd.addColorStop(1, `rgba(${rr},${gg},${bb},0)`)
-        ctx.fillStyle = grd
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2)
-        ctx.fill()
+        // stamp the cached glow sprite (radius r*4 → diameter r*8), faded by `a`
+        const d = p.r * 8
+        ctx.globalAlpha = a
+        ctx.drawImage(sprites[p.hue], p.x - d / 2, p.y - d / 2, d, d)
       }
+      ctx.globalAlpha = 1
 
       raf = requestAnimationFrame(tick)
     }

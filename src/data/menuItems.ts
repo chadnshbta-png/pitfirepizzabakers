@@ -278,6 +278,38 @@ export const menuItems: MenuItem[] = [
     description: 'Three of our best starters on one irresistible sharing board.',
     tag: 'Sharing',
   },
+  {
+    id: 'dip-bbq',
+    name: 'Smoky BBQ Dip',
+    category: 'Sides',
+    image: '/Menu/Sides/bbq-sauce8107.png',
+    description: 'Sweet, smoky and tangy — the dip our wedges were made for.',
+    tag: 'Dip',
+  },
+  {
+    id: 'dip-ranch',
+    name: 'Cool Ranch Dip',
+    category: 'Sides',
+    image: '/Menu/Sides/ranch-sauce2164.png',
+    description: 'Herby buttermilk ranch to cool down anything with a kick.',
+    tag: 'Dip',
+  },
+  {
+    id: 'dip-ketchup',
+    name: 'Classic Ketchup',
+    category: 'Sides',
+    image: '/Menu/Sides/ketchup-sauce5471.png',
+    description: 'The timeless tomato companion for every golden bite.',
+    tag: 'Dip',
+  },
+  {
+    id: 'dip-tikka',
+    name: 'Tikka Hot Dip',
+    category: 'Sides',
+    image: '/Menu/Sides/tid-sauce9048.png',
+    description: 'A spiced, aromatic dip with a slow, warming heat.',
+    tag: 'Dip',
+  },
 
   // ── Desserts ────────────────────────────────────────────────────────
   {
@@ -323,4 +355,5 @@ export const categories: MenuCategory[] = [
 
 /* A few hero shots reused across cinematic sections */
 export const heroPizza = '/Menu/pizza/super-supreme-ph5775.png'
-export const signaturePizza = '/Menu/pizza/chicken-supreme-ph6545.png'
+/* High-resolution signature hero for the "Layer by Layer" stage (retina-crisp). */
+export const signaturePizza = '/images/layer-by-layer.webp'

@@ -152,8 +152,13 @@ export default function SignatureExperience() {
           <img
             data-pizza
             src={signaturePizza}
-            alt="Pizza Hut Chicken Supreme"
-            className="relative z-10 w-full product-shadow will-change-transform pointer-events-none"
+            alt="Pizza Hut signature pan pizza, built layer by layer"
+            width={1480}
+            height={690}
+            decoding="async"
+            draggable={false}
+            className="relative z-10 w-full h-auto object-contain product-shadow will-change-transform pointer-events-none"
+            style={{ imageRendering: 'auto', backfaceVisibility: 'hidden' }}
           />
           {CHIPS.map((c, i) => (
             <div
